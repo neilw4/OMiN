@@ -1,0 +1,49 @@
+\documentclass{article}
+%Gummi|065|=)
+\title{\textbf{DOER for SH project: Opportunistic Microblogging Network}}
+\author{Neil Wells\\
+\texttt{ndw@st-andrews.ac.uk}}
+\date{}
+\begin{document}
+
+\maketitle
+
+\section*{Description}
+Define and create a microblogging platform using an opportunistic network. It should allow smartphone users to broadcast messages to other interested users by only passing on message to users in close proximity.
+
+\section*{Objectives}
+
+\subsection*{Primary Objectives}
+\begin{itemize}
+\item Design and implement a protocol for passing messages and necessary metadata between nodes in close proximity.
+\item Create a core library to manage message storage and routing.
+\item Implement a simple epidemic routing algorithm to send messages to all available nodes.
+\item Design a routing algorithm using user metadata to route messages while disguising message content and metadata.
+\end{itemize}
+
+\subsection*{Secondary Objectives}
+\begin{itemize}
+\item Create a smartphone implementation using the core library.
+\item Implement a more advanced routing algorithm.
+\item Design and implement a mechanism to decide whether a node is trustworthy or not.
+\item Evaluate the performance of the implemented routing algorithms.
+\end{itemize}
+
+\subsection*{Tertiary Objectives}
+\begin{itemize}
+\item Compare the real world vs simulated performance of the routing algorithms.
+\end{itemize}
+
+\section*{Ethics}
+In order to test the real world performance of the network, some metadata will be collected on users. This may include:
+\begin{itemize}
+\item An anonymous user ID.
+\item Anonymised 'Friends list' (or equivalent) of users.
+\item Times and locations of encounters between anonymous users.
+\item Metadata of messages passed during encounters, including message ID and origin ID, but NOT message contents.
+\end{itemize}
+
+\section*{Resources}
+This project will require an Android based smartphone or tablet. If more are needed in later stages, they will be provided by the project supervisor.
+
+\end{document}
