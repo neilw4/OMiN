@@ -1,0 +1,7 @@
+/build
+/target
+/project/project
+/project/target
+.gradle
+.idea
+.idea_modules
