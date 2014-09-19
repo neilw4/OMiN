@@ -1,0 +1,94 @@
+\documentclass{article}
+%Gummi|065|=)
+\title{\textbf{Specification of SH project: Opportunistic Microblogging Network}}
+\author{Neil Wells\\
+\texttt{ndw@st-andrews.ac.uk}}
+\date{}
+\begin{document}
+
+\maketitle
+
+\section*{Summary}
+This document details a secure microblogging platform using opportunistic networks. Users can follow other users by getting their public key, and the network will attempt to deliver messages from the sender to the reciever in a secure and efficient manner.
+
+\section*{Users}
+A user's data consists of:
+\begin{itemize}
+\item An RSA 4096 bit public/private key pair for asymetric encryption.
+\item A unique username which will be linked to a user's public key.
+\item A (hidden) list of users (and their public keys) to follow.
+\end{itemize}
+In order to follow a user, a node must ask every node that it meets if it has the public key of that user. \textbf{There MUST be some mechanism to detect if a username is using multiple public keys. If this happens, all nodes must agree on which to keep, and notify the other that they are unable to use that username.}
+
+\section*{Messages}
+Messages are encoded in JSON format (some other, more concise, formats such as protocol buffers may be considered in the future).
+
+
+\section*{Connections}
+When a detectee node detects another node, they form a connection. Firstly, the detected node acts as an HTTPS (with TLS) server, and the detectee acts as a client. When all information has been transferred, their roles are switched, so the detectee becomes the HTTPS server. The information transfer is as follows.
+
+\begin{verbatim}
+GET /users/<username>
+\end{verbatim}
+Server sends the public key of the user if it exists, otherwise it sends a HTTP-404 message.
+
+This is used for both finding and verifying the public key of a user.
+
+\begin{verbatim}
+POST /messages
+\end{verbatim}
+with probability based bloom filters of what messages the user is interested in and what messages already exist. The server will then send a list of all matching messages in JSON format.
+
+\section*{Decayed probability based bloom filters - a proposal}
+
+Problem:
+A user must broadcast which users they are interested in recieving messages from, without revealing that list.
+
+Solution:
+Encode it in a bloom filter. Other users cannot definitively reverse-engineer the 'follow' list.
+
+Problem:
+A user must also broadcast the interests of nodes they have recently connected with. The probability of broadcasting an interest for a node must be related to how long ago they were contacted.
+
+Solution 1:
+Also store a cumulative bloom filter for recent interests. Occasionally corrupt a bit by setting it to 0 to lose old data and prioritise new data.
+
+\begin{verbatim}
+Filter containing JUST Xavier {X}: [1, 0, 0, 0, 0, 1, 0, 1]
+Filter containing JUST Yann {Y}: [0, 1, 1, 1, 0, 0, 0, 0]
+Filter containing JUST Zander {Z}: [1, 0, 0, 0, 1, 1, 0, 0]
+
+Cumulative filter at start {}: [0, 0, 0, 0, 0, 0, 0, 0]
+
+We would corrupt a bit here but there's nothing to corrupt.
+Recieved filter from another node {X, Y}: [1, 1, 1, 1, 0, 1, 0, 1]
+Add this to the cumulative filter {X, Y}: [1, 1, 1, 1, 0, 1, 0, 1]
+
+Corrupt a random bit {X}: [1, 0, 1, 1, 0, 1, 0, 1]
+Recieved filter from another node {Z}: [1, 0, 0, 0, 1, 1, 0, 0]
+Add this to the cumulative filter {X, Z}: [1, 0, 1, 1, 1, 1, 0, 1]
+\end{verbatim}
+
+Solution 2:
+Store a cumulative bloom filter for recent interest. But use a probability instead of a bit. When broadcasting this bloom filter, convert the probability into a bit. Occasionally reduce the probability of the whole filter to lose old data and prioritise new data.
+
+\begin{verbatim}
+Filter containing JUST Xavier {X}: [1, 0, 0, 0, 0, 1, 0, 1]
+Filter containing JUST Yann {Y}: [0, 1, 1, 1, 0, 0, 0, 0]
+Filter containing JUST Zander {Z}: [1, 0, 0, 0, 1, 1, 0, 0]
+
+Cumulative filter at start {}: [0, 0, 0, 0, 0, 0, 0, 0]
+
+We would reduce probabilities here, but there's nothing to reduce.
+Recieved filter from another node {X, Y}: [1, 1, 1, 1, 0, 1, 0, 1]
+Add this to the cumulative filter {X: 1, Y: 1}: [1, 1, 1, 1, 0, 1, 0, 1]
+Converting probability filter to bit based filter for broadcast {X, Z}: [1, 1, 1, 1, 0, 1, 0, 1]
+
+Reduce probabilities (by 50% for this example) {X: 0.5, Y: 0.5}: [0.5, 0.5, 0.5, 0.5, 0, 0.5, 0, 0.5]
+Recieved filter from another node {Z}: [1, 0, 0, 0, 1, 1, 0, 0]
+Add this to the cumulative filter {X: 0.5, Y: 0.5, Z: 1}: [1, 0.5, 0.5, 0.5, 1, 1, 0, 0.5]
+Converting probability filter to bit based filter for broadcast {X, Z}: [1, 1, 0, 1, 1, 1, 0, 1]
+
+\end{verbatim}
+We also need to decide whether to convert probability filters to bit filters before (hiding metadata) or after broadcast (more information for routing algorithm).
+\end{document}
