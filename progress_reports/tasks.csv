@@ -19,6 +19,7 @@ Number,Done,Status,Description,Type,Importance,Timescale,Depends0,Depends1
 21,,Ready,Design encryption mechanism,task,Primary,Days,,
 22,,Ready,Design routing algorithm,task,Primary,Days,,
 20,,Blocked,Design a routing algorithm using user metadata to route messages while disguising message content and metadata,objective,Primary,Days,21,22
+44,,Blocked,Poster,objective,Primary,Days,20,6
 24,,Ready,Design smartphone UI,task,Secondary,Days,,
 23,,Blocked,Create a smartphone UI,objective,Secondary,Weeks,24,14
 28,,Ready,design trust mechanism,task,Secondary,Days,,
