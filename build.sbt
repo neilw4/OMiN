@@ -2,7 +2,7 @@
 androidDefaults
 
 // Name of your app
-name := "ODiN"
+name := "OMiN"
 
 // Version of your app
 version := "0.1"

@@ -13,13 +13,13 @@ This document details a secure microblogging platform using a pocket switched, o
 
 
 \section*{Terminology}
-A node is any device capable of storing and forwarding messages. It does not have to be a user. For example, a public transport vehicle would make an ideal node because it will encounter lots of users.
+A \textbf{node} is any device capable of storing and forwarding messages. It does not have to be a user. For example, a public transport vehicle would make an ideal node because it will encounter lots of users.
 
-A user is any node with a username and encryption key capable of sending and recieving messages.
+A \textbf{user} is any node with a username and encryption key capable of sending and recieving messages.
 
-A message is a text-based microblog broadcasted from a user to all interested users.
+A \textbf{message} is a text-based microblog post broadcasted from a user to all interested users.
 
-Two nodes make a connection when they are in close proximity to each other and have established a communication channel.
+Two nodes make a \textbf{connection} when they are in close proximity to each other and have established a communication channel.
 
 \section*{Users}
 A user's data consists of:
@@ -36,7 +36,8 @@ The sender takes the form of a username, and the message contents is a string.
 
 The message id is used to verify that the message is intact, was sent from the user it says it was, and that it has not been modified. It consists of SHA-256 hash of the message contents, plus the date and time that the message was sent in ISO-8601 format, all encrypted with the senders private key. All users with the senders public key can then verify the message. If the message is unverifiable, it is discarded and the sender is notified via a secure direct message.
 
-Secure direct messaging is implemented by encrypting the message contents with the public key of the reciever.
+Secure direct messaging is implemented by encrypting the message contents with the public key of the reciever and adding the hashtag \#to\_\textless username\textgreater.
+
 
 Nodes will store a finite number of messages. Nodes will also store a distribution count. This is incremented when the message is sent to another node or another node indicates that it it already has the message. When a message is to be evicted to make space, the most distributed message will be removed.
 
