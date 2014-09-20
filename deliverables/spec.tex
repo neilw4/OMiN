@@ -19,6 +19,8 @@ A user is any node with a username and encryption key capable of sending and rec
 
 A message is a text-based microblog broadcasted from a user to all interested users.
 
+Two nodes make a connection when they are in close proximity to each other and have established a communication channel.
+
 \section*{Users}
 A user's data consists of:
 \begin{itemize}
@@ -28,7 +30,7 @@ A user's data consists of:
 \end{itemize}
 
 \section*{Messages}
-Messages are encoded in JSON format (some other, more concise, formats such as protocol buffers may be considered in the future). They consist of a sender, a message id and message contents.
+Messages consist of a sender, a message id and message contents.
 
 The sender takes the form of a username, and the message contents is a string.
 
