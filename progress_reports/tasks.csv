@@ -17,8 +17,7 @@ Number,Done,Status,Description,Type,Importance,Timescale,Depends0,Depends1
 18,,Blocked,implement TTL,task,Primary,Days,19,
 17,,Blocked,implement a simple epidemic routing algorithm to send message to all available nodes,objective,Primary,Days,18,19
 21,,Ready,Design encryption mechanism,task,Primary,Days,,
-22,,Ready,Design routing algorithm,task,Primary,Days,,
-20,,Blocked,Design a routing algorithm using user metadata to route messages while disguising message content and metadata,objective,Primary,Days,21,22
+20,,Blocked,Design a routing algorithm using user metadata to route messages while disguising message content and metadata,objective,Primary,Days,21,
 44,,Blocked,Poster,objective,Primary,Days,20,6
 24,,Ready,Design smartphone UI,task,Secondary,Days,,
 23,,Blocked,Create a smartphone UI,objective,Secondary,Weeks,24,14
