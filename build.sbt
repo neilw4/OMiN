@@ -1,17 +1,29 @@
-// Include the Android plugin
-androidDefaults
+import android.Keys._
 
-// Name of your app
-name := "OMiN"
+android.Plugin.androidBuild
 
-// Version of your app
-version := "0.1"
+name := "SlickAndroidExample"
 
-// Version number of your app
-versionCode := 0
+scalacOptions += "-feature"
 
-// Version of Scala
-scalaVersion := "2.10.1"
+run <<= run in Android
 
-// Version of the Android platform SDK
-platformName := "android-20"
+install <<= install in Android
+
+libraryDependencies ++= Seq(
+  "org.slf4j" % "slf4j-nop" % "1.6.4",
+  "com.typesafe.slick" %% "slick" % "2.0.0"
+)
+
+proguardOptions in Android ++= Seq(
+  "-dontwarn javax.naming.InitialContext",
+  "-dontnote org.slf4j.**",
+  "-keep class scala.collection.Seq.**",
+  "-keep public class org.sqldroid.**",
+  "-keep class scala.concurrent.Future$.**",
+  "-keep class scala.slick.driver.JdbcProfile$Implicits"
+)
+
+proguardCache in Android ++= Seq(
+  ProguardCache("slick") % "com.typesafe.slick"
+)
