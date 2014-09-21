@@ -12,5 +12,6 @@ Progress report for period 2014-09-15 to 2014-09-22
 - start implementation
 
 # Topics for discussion
-- are  there any problems with the spec?
+- are there any problems with the spec?
 - what communication protocol should be used?
+- sign ethics form
