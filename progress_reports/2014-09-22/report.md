@@ -8,8 +8,11 @@ Progress report for period 2014-09-15 to 2014-09-22
 - set up build tools
 
 # Goals for next week
-- finalise specs
-- start implementation
+- create requirements
+- add build instructions
+- read lots of papers
+- start report
+- reformat tasks in context of requirements
 
 # Topics for discussion
 - are there any problems with the spec?
