@@ -8,8 +8,11 @@ Progress report for period 2014-09-22 to 2014-09-29
 
 # Goals for next week
 - start report
-- read more papers
+- context survey
+- read more papers - ID based encryption and DTNRG protocols
 - start to make design decisions
+- finish requirements
+- justify design decisions
 
 # Topics for discussion
 - Are requirements OK?
