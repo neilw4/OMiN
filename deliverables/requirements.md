@@ -26,4 +26,5 @@
 
 # Functional Requirements
 - Medium: The system shall ensure that messages sent by a user will reach at least 50% of intented recipients.
-- Medium: The system shall evict messages from the message buffer if the buffer size exceeds some maximum size.
+- Medium: The system shall restrict the size of the message buffer by evicting messages.
+- Medium: The system shall use no more that 5% of the available power.
