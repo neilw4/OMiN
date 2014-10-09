@@ -20,7 +20,7 @@ We can extend this argument further by saying that if a username is wholly depen
 
 Based on the above logic, we propose the following scheme for verifying messages passed through an opportunistic network:
 
-Users generate a random public/private key pair using 4096-bit RSA. Their username is the base-64 representation of the last 128 bits of the public key (a 2 character string - this seems small but the chances of collisions are minute). The public key/username pair can then be distributed throughout the network. Messages sent by the user are signed with their private key.
+Users generate a random public/private key pair using 4096-bit RSA. Their username is the base-64 representation of the SHA-256 hash of the public key with some parity bits (a 4 character string - this seems small but the chances of collisions are minute). The public key/username pair can then be distributed throughout the network. Messages sent by the user are signed with their private key.
 
 If I wish to obtain the public key of a user, I must gain their username without using the opportunistic network (in a similar way to obtaining an email address). Once I have this, I can ask other nodes for the associated public key. This request may be obscured by various means such as those described in the SSNR-OSNR paper. I can verify that the public key is indeed related to that username and I can now verify that any message received from that user definitely originated from that user, without ever having to trust a network node.
 

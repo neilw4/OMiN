@@ -7,8 +7,10 @@ Progress report for period 2014-09-29 to 2014-10-09
 - Read more papers on security and encryption
 
 # Goals for next week
-- start to make design decision
-- justify design decisions
+- context survey - references for security
+- context survey - ID based encryption
+- context survey - fix references
+- design decisions
 
 # Topics for discussion
 - Is context survey OK?
