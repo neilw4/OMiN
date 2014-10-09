@@ -7,10 +7,12 @@ Progress report for period 2014-09-29 to 2014-10-09
 - Read more papers on security and encryption
 
 # Goals for next week
-- context survey - references for security
-- context survey - ID based encryption
-- context survey - fix references
+- context survey - small changes
 - design decisions
+- decide use cases
+- outline problem parameters
+- start implementation
+
 
 # Topics for discussion
 - Is context survey OK?
