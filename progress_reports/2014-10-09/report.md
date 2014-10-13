@@ -13,7 +13,6 @@ Progress report for period 2014-09-29 to 2014-10-09
 - outline problem parameters
 - start implementation
 
-
 # Topics for discussion
 - Is context survey OK?
 - user-key binding idea
