@@ -1,0 +1,31 @@
+An Identity-Based Key Distribution Scheme for Secure Opportunistic Networks
+===
+
+Opportunistic networks can be secured using asymmetric keys to verify the identity of a message sender. However, this requires a method (often trust based) to distribute public keys throughout the network. Another option is to use identity based encryption where a user's identity is used as the public key. A trusted private key generator (PKG) then generates a private key for that user and securely sends it to them. In an opportunistic network, the major problem is accessing the PKG. There are some schemes for using multiple PKGs in an opportunistic network, but this is rarely scalable. Our scheme has the following advantages:
+
+- If every node has access to an internet connection, the scheme simplifies to normal ID based encryption.
+- The scheme is scalable to any number of users.
+- The scheme can cope with situations where multiple users choose the same ID.
+- The probability of a user's identity being compromised can be directly quantified and will be reduced as much as possible.
+
+The problem with multiple PKGs is determining how many to use - too few and it is hard for a user to be certified but too many and there is a risk that a PKG will be compromised. We can solve this problem by quantifying the trustworthiness of a PKG and allowing the user to increase their trustworthiness by using multiple PKGs or moving to a more trustworthy PKG.
+
+Consider a classic ID-based certification scheme with a single internet based PKG. This PKG has a master asymmetric key where the public key, Pu(M), is known by everyone and the private key, Pr(M), is known only by the PKG. When a user requests a private key, the PKG checks that the username, U, is not already in use and generates a private key, Pr(U, M), for the user based on the username and the PKG's private master key. We can now say that the PKG has certified the user. Because we trust the master PKG, we can now trust that U is unique and we can verify that a message was sent by U.
+
+Now consider what happens if U is allowed to become a PKG using their private key, Pr(U, M). User V wishes to be authenticated by U (without access to the M, the master PKG). U cannot verify that V's username is unique, but U can verify that it has not authenticated any other user with the same username. We know that U is a unique username and that V is unique among users certified by U. So we can give V a unique path U->V. V's public key is the combination of U and V's usernames. U can generate a private key, Pr(V, U, M), for V based on this public key. If we can trust U, then we can trust that U->V is unique and that a message was sent by U->V. If we can't trust U, then U has V's private key and is capable of impersonating V.
+
+V is now also capable of becoming a PKG for user U->V->X with private key Pr(X, V, U, M), although users U and V are now both capable of impersonating X, so they must both be trusted. And it's turtles all the way down.
+
+As the authentication chain gets longer, more PKGs must be trusted. For this reason, if a user has the chance to create a shorter authentication chain (e.g. by using M, the master PKG), they should do so.
+
+If shortening the authentication chain is not possible (e.g. M is not available), trustworthiness can be increased by using multiple authentication chains and private keys. For example, a user, X, has authentication chains U->X and V->X and private keys Pr(X, U, M) and Pr(X, V, M). If both private keys are used to sign a message, U or V are unable to impersonate X unless they worked together.
+
+A node is compromised if it is untrustworthy OR all of it's parents have been compromised. Formally, the probability of a node being compromised, C(n) is related to the chance of any node being untrustworthy, V and the chance of any of it's parents, P(n) being compromised. C(n)=1-(1-V)PI_over_all_p_in_P(n)(C(p)). We can also derive the probability that a node is trustworthy, T(n)=1-C(n)=(1-V)PI_over_all_p_in_P(n)(1-T(p)).
+
+Problem: choose suitable value for V or factor it out of the equation (looks like it doesn't matter for 0<V<1).
+
+Problem: key generation may be transitive (e.g. Pr(U, V) = Pr(V, U)).
+Solution: force acyclic graph, authenticate with M asap.
+
+problem: multiple users with the same ID
+solution: users are naturally divided into communities based on which PKGs are used. The PKG will ensure that users within a community cannot share an identity. Identical users in different communities can co-exist with no ill effect. Only one of the identical users can be authenticated by the master PKG and will be notified if the identity already exists on the PKG.
