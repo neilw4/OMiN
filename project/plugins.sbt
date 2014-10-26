@@ -1,4 +1,4 @@
-addSbtPlugin("com.hanhuy.sbt" % "android-sdk-plugin" % "1.3.5")
+addSbtPlugin("com.hanhuy.sbt" % "android-sdk-plugin" % "1.2.9")
 
 resolvers += "Sonatype snapshots" at "https://oss.sonatype.org/content/repositories/snapshots/"
 

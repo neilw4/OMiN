@@ -1,5 +1,5 @@
 # Build instructions
-This requires SBT 13.x, and the Android SDK, with the android-20 build tools.
+This requires SBT 13.x, and the Android SDK, with the android-21 build tools.
 
 To build:
 	sbt android:package
