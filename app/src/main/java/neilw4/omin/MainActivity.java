@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import neilw4.omin.background.CommunicationService;
+import neilw4.omin.background.BluetoothOminService;
 
 
 public class MainActivity extends Activity {
@@ -14,7 +14,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        CommunicationService.start(this);
+        BluetoothOminService.start(this);
     }
 
 

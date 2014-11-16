@@ -18,12 +18,12 @@
         </activity>
 
         <service
-            android:name="neilw4.omin.background.CommunicationService"
+            android:name=".background.BluetoothOminService"
             android:exported="false" >
         </service>
 
         <receiver
-            android:name="neilw4.omin.background.StartBackgroundReceiver"
+            android:name=".background.EnableDisableBackgroundReceiver"
             android:enabled="true"
             android:exported="false" >
             <intent-filter>
@@ -31,18 +31,17 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.BATTERY_OKAY" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".background.StopBackgroundReceiver"
-            android:enabled="true"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="android.intent.action.BATTERY_LOW"/>
-                <action android:name="android.intent.action.AIRPLANE_MODE"/>
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
+
+                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
+                <action android:name="android.intent.action.BATTERY_LOW" />
+                <action android:name="android.intent.action.AIRPLANE_MODE" />
             </intent-filter>
         </receiver>
     </application>
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
+    <uses-feature android:name="android.hardware.bluetooth" android:required="true"/>
+    <uses-sdk android:targetSdkVersion="21" android:minSdkVersion="14" />
 </manifest>
