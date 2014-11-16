@@ -1,10 +1,7 @@
-/build
-/target
-/project/project
-/project/target
 .gradle
-.idea
-.idea_modules
-*.swp
-~$*
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
 jpbc
