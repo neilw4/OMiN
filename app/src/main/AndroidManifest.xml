@@ -2,6 +2,18 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="neilw4.omin" >
 
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="21" />
+
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="true" />
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -17,13 +29,8 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".background.BluetoothOminService"
-            android:exported="false" >
-        </service>
-
         <receiver
-            android:name=".background.EnableDisableBackgroundReceiver"
+            android:name=".background.BluetoothServiceManager"
             android:enabled="true"
             android:exported="false" >
             <intent-filter>
@@ -31,17 +38,22 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.BATTERY_OKAY" />
-
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
                 <action android:name="android.intent.action.BATTERY_LOW" />
                 <action android:name="android.intent.action.AIRPLANE_MODE" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".background.BluetoothServerService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
+
+        <service
+            android:name=".background.BluetoothDiscoveryService"
+            android:exported="false" >
+        </service>
     </application>
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-
-    <uses-feature android:name="android.hardware.bluetooth" android:required="true"/>
-    <uses-sdk android:targetSdkVersion="21" android:minSdkVersion="14" />
 </manifest>

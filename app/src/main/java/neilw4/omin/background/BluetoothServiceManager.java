@@ -4,12 +4,16 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
-public class EnableDisableBackgroundReceiver extends BroadcastReceiver {
-    public static String TAG = "EnableDisableBackgroundReceiver";
+public class BluetoothServiceManager extends BroadcastReceiver {
+    public static String TAG = BluetoothServiceManager.class.getSimpleName();
+    public static String OMIN_SERVICE_NAME = "OMiN Service";
+    public static UUID OMIN_SERVICE_UUID = new UUID(-9182340414495433873l, 3307222079317493476l);
 
     private static List<String> ENABLE_ACTIONS = Arrays.asList(
             "android.intent.action.BOOT_COMPLETED",
@@ -25,22 +29,36 @@ public class EnableDisableBackgroundReceiver extends BroadcastReceiver {
 
     private static String BLUETOOTH_STATE_CHANGED_ACTION = "android.bluetooth.adapter.action.STATE_CHANGED";
 
+    public static void start(Context context) {
+        Log.d(TAG, "Starting bluetooth services");
+        BluetoothDiscoveryService.start(context);
+        BluetoothServerService.start(context);
+    }
+
+    public static void stop(Context context) {
+        Log.d(TAG, "Stopping bluetooth services");
+        BluetoothDiscoveryService.stop(context);
+        BluetoothServerService.stop(context);
+    }
+
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
+        Log.d(TAG, "Received action " + action);
         if (ENABLE_ACTIONS.contains(action)) {
-            BluetoothOminService.start(context);
+            start(context);
         } else if (DISABLE_ACTIONS.contains(action)) {
-            BluetoothOminService.stop(context);
+            stop(context);
         } else if (BLUETOOTH_STATE_CHANGED_ACTION.equals(action)) {
             switch (intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, -1)) {
                 case BluetoothAdapter.STATE_ON: {
-                    BluetoothOminService.start(context);
+                    start(context);
                     break;
                 }
                 case BluetoothAdapter.STATE_OFF:
                 case BluetoothAdapter.STATE_TURNING_OFF: {
-                    BluetoothOminService.stop(context);
+                    stop(context);
+                    break;
                 }
             }
         }
