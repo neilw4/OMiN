@@ -14,16 +14,16 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Random;
 
-public class BluetoothServerService extends Service {
+public class BluetoothServer extends Service {
 
-    public static String TAG = BluetoothServerService.class.getSimpleName();
+    public static String TAG = BluetoothServer.class.getSimpleName();
 
     public static void start(Context context) {
-        context.startService(new Intent(context, BluetoothServerService.class));
+        context.startService(new Intent(context, BluetoothServer.class));
     }
 
     public static void stop(Context context) {
-        context.stopService(new Intent(context, BluetoothServerService.class));
+        context.stopService(new Intent(context, BluetoothServer.class));
     }
 
     Thread serverThread;
@@ -31,17 +31,19 @@ public class BluetoothServerService extends Service {
     private class ServerThread extends Thread {
         public BluetoothServerSocket serverSocket;
 
-        public ServerThread(BluetoothServerSocket serverSocket) {
-            this.serverSocket = serverSocket;
+        public ServerThread(BluetoothAdapter btAdapter) throws IOException {
+                this.serverSocket = btAdapter.listenUsingInsecureRfcommWithServiceRecord(BluetoothServiceManager.OMIN_SERVICE_NAME, BluetoothServiceManager.OMIN_SERVICE_UUID);
         }
 
         @Override
         public void run() {
-            Log.d(TAG, "Starting server");
+            Log.d(TAG, "Starting server " + hashCode());
             while (!isInterrupted()) {
                 try {
+                    Log.d(TAG, "server " + hashCode() + " waiting for connection");
                     BluetoothSocket socket = serverSocket.accept();
-                int i = new Random().nextInt();
+                    Log.d(TAG, "accepted connection from client");
+                    int i = new Random().nextInt();
                     OutputStreamWriter out = new OutputStreamWriter(socket.getOutputStream());
                     out.write(i);
                     out.flush();
@@ -85,7 +87,7 @@ public class BluetoothServerService extends Service {
             }
 
             try {
-                serverThread = new ServerThread(btAdapter.listenUsingInsecureRfcommWithServiceRecord(BluetoothServiceManager.OMIN_SERVICE_NAME, BluetoothServiceManager.OMIN_SERVICE_UUID));
+                serverThread = new ServerThread(btAdapter);
                 serverThread.start();
             } catch (IOException e) {
                 Log.e(TAG, "Exception while setting up server socket: " + e);

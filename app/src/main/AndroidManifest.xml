@@ -14,6 +14,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -30,30 +33,37 @@
         </activity>
 
         <receiver
-            android:name=".background.BluetoothServiceManager"
+            android:name="neilw4.omin.background.BluetoothServiceManager"
             android:enabled="true"
             android:exported="false" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
                 <action android:name="android.intent.action.BATTERY_OKAY" />
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
                 <action android:name="android.intent.action.BATTERY_LOW" />
-                <action android:name="android.intent.action.AIRPLANE_MODE" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name=".background.BluetoothServerService"
+            android:name=".background.BluetoothServer"
             android:enabled="true"
             android:exported="false" >
         </service>
-
         <service
-            android:name=".background.BluetoothDiscoveryService"
+            android:name=".background.BluetoothDiscovery"
             android:exported="false" >
         </service>
+
+        <receiver
+            android:name="neilw4.omin.background.BluetoothClient"
+            android:enabled="true"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.FOUND" />
+                <action android:name="android.bluetooth.device.action.UUID" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

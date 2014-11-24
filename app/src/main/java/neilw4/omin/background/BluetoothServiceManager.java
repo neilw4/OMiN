@@ -18,27 +18,25 @@ public class BluetoothServiceManager extends BroadcastReceiver {
     private static List<String> ENABLE_ACTIONS = Arrays.asList(
             "android.intent.action.BOOT_COMPLETED",
             "android.intent.action.MY_PACKAGE_REPLACED",
-            "android.intent.action.ACTION_POWER_CONNECTED",
             "android.intent.action.BATTERY_OKAY"
     );
 
     private static List<String> DISABLE_ACTIONS = Arrays.asList(
-            "android.intent.action.BATTERY_LOW",
-            "android.intent.action.AIRPLANE_MODE"
+            "android.intent.action.BATTERY_LOW"
     );
 
     private static String BLUETOOTH_STATE_CHANGED_ACTION = "android.bluetooth.adapter.action.STATE_CHANGED";
 
     public static void start(Context context) {
         Log.d(TAG, "Starting bluetooth services");
-        BluetoothDiscoveryService.start(context);
-        BluetoothServerService.start(context);
+        BluetoothDiscovery.start(context);
+        BluetoothServer.start(context);
     }
 
     public static void stop(Context context) {
         Log.d(TAG, "Stopping bluetooth services");
-        BluetoothDiscoveryService.stop(context);
-        BluetoothServerService.stop(context);
+        BluetoothDiscovery.stop(context);
+        BluetoothServer.stop(context);
     }
 
     @Override
