@@ -1,6 +1,7 @@
 package neilw4.omin.background;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -8,41 +9,46 @@ import android.util.Log;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
-public class BluetoothServiceManager extends BroadcastReceiver {
-    public static String TAG = BluetoothServiceManager.class.getSimpleName();
-    public static String OMIN_SERVICE_NAME = "OMiN Service";
-    public static UUID OMIN_SERVICE_UUID = new UUID(-9182340414495433873l, 3307222079317493476l);
+public class ServiceStarter extends BroadcastReceiver {
+    public static String TAG = ServiceStarter.class.getSimpleName();
 
     private static List<String> ENABLE_ACTIONS = Arrays.asList(
-            "android.intent.action.BOOT_COMPLETED",
-            "android.intent.action.MY_PACKAGE_REPLACED",
-            "android.intent.action.BATTERY_OKAY"
+            Intent.ACTION_BOOT_COMPLETED,
+            Intent.ACTION_MY_PACKAGE_REPLACED,
+            Intent.ACTION_BATTERY_OKAY
     );
 
     private static List<String> DISABLE_ACTIONS = Arrays.asList(
-            "android.intent.action.BATTERY_LOW"
+            Intent.ACTION_BATTERY_LOW
     );
 
-    private static String BLUETOOTH_STATE_CHANGED_ACTION = "android.bluetooth.adapter.action.STATE_CHANGED";
+    private static List<String> PASS_ACTIONS = Arrays.asList(
+            BluetoothAdapter.ACTION_DISCOVERY_STARTED,
+            BluetoothAdapter.ACTION_DISCOVERY_FINISHED,
+            BluetoothDevice.ACTION_FOUND,
+            BluetoothDevice.ACTION_UUID
+    );
+
+    private static String BLUETOOTH_STATE_CHANGED_ACTION = BluetoothAdapter.ACTION_STATE_CHANGED;
 
     public static void start(Context context) {
-        Log.d(TAG, "Starting bluetooth services");
-        BluetoothDiscovery.start(context);
-        BluetoothServer.start(context);
+        Log.i(TAG, "Starting bluetooth services");
+        OminService.start(context);
     }
 
     public static void stop(Context context) {
-        Log.d(TAG, "Stopping bluetooth services");
-        BluetoothDiscovery.stop(context);
-        BluetoothServer.stop(context);
+        Log.i(TAG, "Stopping bluetooth services");
+        OminService.stop(context);
+    }
+
+    public static void pass(Context context, Intent intent) {
+        OminService.pass(context, intent);
     }
 
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        Log.d(TAG, "Received action " + action);
         if (ENABLE_ACTIONS.contains(action)) {
             start(context);
         } else if (DISABLE_ACTIONS.contains(action)) {
@@ -59,8 +65,9 @@ public class BluetoothServiceManager extends BroadcastReceiver {
                     break;
                 }
             }
-        }
-        else {
+        } else if (PASS_ACTIONS.contains(action)) {
+            pass(context, intent);
+        } else {
             android.util.Log.e(TAG, "Unrecognised intent action: " + action);
         }
     }

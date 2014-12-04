@@ -33,7 +33,7 @@
         </activity>
 
         <receiver
-            android:name="neilw4.omin.background.BluetoothServiceManager"
+            android:name=".background.ServiceStarter"
             android:enabled="true"
             android:exported="false" >
             <intent-filter>
@@ -42,28 +42,19 @@
                 <action android:name="android.intent.action.BATTERY_OKAY" />
                 <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
                 <action android:name="android.intent.action.BATTERY_LOW" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name=".background.BluetoothServer"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
-        <service
-            android:name=".background.BluetoothDiscovery"
-            android:exported="false" >
-        </service>
-
-        <receiver
-            android:name="neilw4.omin.background.BluetoothClient"
-            android:enabled="true"
-            android:exported="false" >
-            <intent-filter>
+                <action android:name="android.bluetooth.adapter.action.DISCOVERY_STARTED" />
+                <action android:name="android.bluetooth.adapter.action.DISCOVERY_FINISHED" />
                 <action android:name="android.bluetooth.device.action.FOUND" />
                 <action android:name="android.bluetooth.device.action.UUID" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".background.OminService"
+            android:enabled="true"
+            android:exported="false" >
+        </service>
+
     </application>
 
 </manifest>
