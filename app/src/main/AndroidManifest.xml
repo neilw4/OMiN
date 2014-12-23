@@ -21,7 +21,9 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme"
+        android:name="com.orm.SugarApp">
+
         <activity
             android:name="neilw4.omin.MainActivity"
             android:label="@string/app_name" >
@@ -55,6 +57,10 @@
             android:exported="false" >
         </service>
 
+        <meta-data android:name="DATABASE" android:value="omin.db" />
+        <meta-data android:name="VERSION" android:value="2" />
+        <meta-data android:name="QUERY_LOG" android:value="true" />
+        <meta-data android:name="DOMAIN_PACKAGE_NAME" android:value="neilw4.omin" />
     </application>
 
 </manifest>
