@@ -1,4 +1,4 @@
-package neilw4.omin.background;
+package neilw4.omin.connection;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -8,7 +8,6 @@ import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
 import android.util.Log;
@@ -18,9 +17,11 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.UUID;
 
-public class OminService extends IntentService {
+import neilw4.omin.ConnectionCallback;
 
-    public static final String TAG = OminService.class.getSimpleName();
+public class ConnectionService extends IntentService {
+
+    public static final String TAG = ConnectionService.class.getSimpleName();
 
     public static final String ACTION_START = "neilw4.omin.BluetoothService.START";
     public static final String ACTION_STOP = "neilw4.omin.BluetoothService.STOP";
@@ -29,20 +30,19 @@ public class OminService extends IntentService {
     // Start bluetooth discovery after REPEAT_SECONDS seconds.
     public static final int REPEAT_SECONDS = 300;
 
-    public OminService() {
+    public ConnectionService() {
         super(TAG);
     }
 
-    private static MessageCallback messageCallback = new MessageCallback();
-    private static Handler messageHandler = new Handler(messageCallback);
+    private static ConnectionCallback connectionCallback = new ConnectionCallback();
     private static PendingIntent repeatingIntent = null;
 
     public static void start(Context context) {
         if (repeatingIntent == null) {
-            Intent startIntent = new Intent(context, OminService.class);
+            Intent startIntent = new Intent(context, ConnectionService.class);
             startIntent.setAction(ACTION_START);
             context.startService(startIntent);
-            Intent scanIntent = new Intent(context, OminService.class);
+            Intent scanIntent = new Intent(context, ConnectionService.class);
             scanIntent.setAction(ACTION_SCAN);
             repeatingIntent = PendingIntent.getService(context, 0, scanIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             AlarmManager alarm = (AlarmManager) context.getSystemService(ALARM_SERVICE);
@@ -56,14 +56,14 @@ public class OminService extends IntentService {
             alarm.cancel(repeatingIntent);
             repeatingIntent = null;
 
-            Intent stopIntent = new Intent(context, OminService.class);
+            Intent stopIntent = new Intent(context, ConnectionService.class);
             stopIntent.setAction(ACTION_STOP);
             context.stopService(stopIntent);
         }
     }
 
     public static void pass(Context context, Intent broadcast) {
-        Intent i = new Intent(context, OminService.class);
+        Intent i = new Intent(context, ConnectionService.class);
         i.setAction(broadcast.getAction());
         Bundle extras = broadcast.getExtras();
         if (extras != null) {
@@ -82,37 +82,41 @@ public class OminService extends IntentService {
     protected synchronized void startServer() {
         if (connection == null) {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-            if (adapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-                Log.i(TAG, "making discoverable");
-                // Make bluetooth discoverable.
-                Intent discoverableIntent = new
-                        Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-                discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
-                discoverableIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(discoverableIntent);
-            }
+            if (adapter != null) {
+                if (adapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
+                    Log.i(TAG, "making discoverable");
+                    // Make bluetooth discoverable.
+                    Intent discoverableIntent = new
+                            Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                    discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 0);
+                    discoverableIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(discoverableIntent);
+                }
 
-            Log.i(TAG, "starting server");
-            connection = new ConnectionManager(this, messageHandler);
-            messageCallback.setConnection(connection);
-            messageCallback.setContext(getBaseContext());
-            connection.start();
+                Log.i(TAG, "starting server");
+                connection = new ConnectionManager(connectionCallback);
+                connectionCallback.setConnection(connection);
+                connectionCallback.setContext(getBaseContext());
+                connection.start();
+            }
         }
     }
 
     protected void stopServer() {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-        if (adapter.isDiscovering()) {
-            Log.i(TAG, "cancelling discovery");
-            adapter.cancelDiscovery();
-        }
+        if (adapter != null) {
+            if (adapter.isDiscovering()) {
+                Log.i(TAG, "cancelling discovery");
+                adapter.cancelDiscovery();
+            }
 
-        if (connection != null) {
-            connection.stop();
-            connection = null;
+            if (connection != null) {
+                connection.stop();
+                connection = null;
+            }
+            connectionCallback.setConnection(null);
+            connectionCallback.setContext(null);
         }
-        messageCallback.setConnection(null);
-        messageCallback.setContext(null);
     }
 
     protected void connectToDevice(BluetoothDevice device) {

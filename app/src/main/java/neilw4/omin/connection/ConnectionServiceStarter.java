@@ -1,4 +1,4 @@
-package neilw4.omin.background;
+package neilw4.omin.connection;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -10,8 +10,8 @@ import android.util.Log;
 import java.util.Arrays;
 import java.util.List;
 
-public class ServiceStarter extends BroadcastReceiver {
-    public static String TAG = ServiceStarter.class.getSimpleName();
+public class ConnectionServiceStarter extends BroadcastReceiver {
+    public static String TAG = ConnectionServiceStarter.class.getSimpleName();
 
     private static List<String> ENABLE_ACTIONS = Arrays.asList(
             Intent.ACTION_BOOT_COMPLETED,
@@ -34,16 +34,16 @@ public class ServiceStarter extends BroadcastReceiver {
 
     public static void start(Context context) {
         Log.i(TAG, "Starting bluetooth services");
-        OminService.start(context);
+        ConnectionService.start(context);
     }
 
     public static void stop(Context context) {
         Log.i(TAG, "Stopping bluetooth services");
-        OminService.stop(context);
+        ConnectionService.stop(context);
     }
 
     public static void pass(Context context, Intent intent) {
-        OminService.pass(context, intent);
+        ConnectionService.pass(context, intent);
     }
 
     @Override

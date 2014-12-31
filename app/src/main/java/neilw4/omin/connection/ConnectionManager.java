@@ -1,4 +1,4 @@
-package neilw4.omin.background;
+package neilw4.omin.connection;
 
 /*
  * Copyright (C) 2014 The Android Open Source Project
@@ -20,10 +20,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
-import android.content.Context;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,7 +48,7 @@ public class ConnectionManager {
 
     // Member fields
     private final BluetoothAdapter mAdapter;
-    private final Handler mHandler;
+    private final ConnectionCallback mCallback;
     private AcceptThread mSecureAcceptThread;
     private AcceptThread mInsecureAcceptThread;
     private ConnectThread mConnectThread;
@@ -65,28 +61,19 @@ public class ConnectionManager {
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
-
-    // Message types sent from the BluetoothChatService Handler
-    public static final int MESSAGE_STATE_CHANGE = 1;
-    public static final int MESSAGE_READ = 2;
-    public static final int MESSAGE_WRITE = 3;
-    public static final int MESSAGE_DEVICE_NAME = 4;
-    public static final int MESSAGE_FAILURE = 5;
-
-    // Key names received from the BluetoothChatService Handler
-    public static final String DEVICE_NAME = "device_name";
-    public static final String CONNECTED_TO_SERVER = "connected_to_server";
+    public interface ConnectionCallback {
+        public void onRecieveMessage(byte[] readBuf, int bytes);
+        public void onConnected(BluetoothDevice device, boolean connectedToServer);
+        public void onFailure(String msg);
+    }
 
     /**
      * Constructor. Prepares a new BluetoothChat session.
-     *
-     * @param context The UI Activity Context
-     * @param handler A Handler to send messages back to the UI Activity
      */
-    public ConnectionManager(Context context, Handler handler) {
+    public ConnectionManager(ConnectionCallback callback) {
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
-        mHandler = handler;
+        mCallback = callback;
     }
 
     /**
@@ -98,9 +85,6 @@ public class ConnectionManager {
         if (mState != state) {
             Log.v(TAG, "setState() " + mState + " -> " + state);
             mState = state;
-
-            // Give the new state to the Handler so the UI Activity can update
-            mHandler.obtainMessage(MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
         }
     }
 
@@ -178,8 +162,8 @@ public class ConnectionManager {
      * @param socket The BluetoothSocket on which the connection was made
      * @param device The BluetoothDevice that has been connected
      */
-    public synchronized void connected(BluetoothSocket socket, BluetoothDevice
-            device, final String socketType, boolean connectedToServer) {
+    public synchronized void connected(final BluetoothSocket socket, final BluetoothDevice
+            device, final String socketType, final boolean connectedToServer) {
         Log.v(TAG, "connected, Socket Type:" + socketType);
 
         // Cancel the thread that completed the connection
@@ -208,15 +192,8 @@ public class ConnectionManager {
         mConnectedThread = new ConnectedThread(socket, socketType);
         mConnectedThread.start();
 
-        // Send the name of the connected device back to the UI Activity
-        Message msg = mHandler.obtainMessage(MESSAGE_DEVICE_NAME);
-        Bundle bundle = new Bundle();
-        bundle.putString(DEVICE_NAME, device.getName());
-        bundle.putBoolean(CONNECTED_TO_SERVER, connectedToServer);
-        msg.setData(bundle);
-        mHandler.sendMessage(msg);
-
         setState(STATE_CONNECTED);
+        mCallback.onConnected(device, connectedToServer);
     }
 
     /**
@@ -269,10 +246,7 @@ public class ConnectionManager {
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
     private void connectionFailed() {
-        // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(MESSAGE_FAILURE, "Unable to connect device");
-        mHandler.sendMessage(msg);
-
+        mCallback.onFailure("Unable to connect to device");
         // Start the service over to restart listening mode
         ConnectionManager.this.start();
     }
@@ -490,20 +464,18 @@ public class ConnectionManager {
 
         public void run() {
             Log.v(TAG, "BEGIN mConnectedThread");
-            byte[] buffer = new byte[1024];
-            int bytes;
+            final byte[] buffer = new byte[1024];
 
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
                     // Read from the InputStream
-                    bytes = mmInStream.read(buffer);
+                    final int bytes = mmInStream.read(buffer);
 
                     // Send the obtained bytes to the UI Activity
-                    mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
-                            .sendToTarget();
+                    mCallback.onRecieveMessage(buffer, bytes);
                 } catch (IOException e) {
-                    Log.e(TAG, "disconnected");
+                    Log.v(TAG, "disconnected");
                     connectionLost();
                     // Start the service over to restart listening mode
                     ConnectionManager.this.start();
@@ -520,10 +492,6 @@ public class ConnectionManager {
         public void write(byte[] buffer) {
             try {
                 mmOutStream.write(buffer);
-
-                // Share the sent message back to the UI Activity
-                mHandler.obtainMessage(MESSAGE_WRITE, -1, -1, buffer)
-                        .sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Exception during write", e);
             }

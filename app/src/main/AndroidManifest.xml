@@ -35,7 +35,7 @@
         </activity>
 
         <receiver
-            android:name=".background.ServiceStarter"
+            android:name=".connection.ConnectionServiceStarter"
             android:enabled="true"
             android:exported="false" >
             <intent-filter>
@@ -52,7 +52,7 @@
         </receiver>
 
         <service
-            android:name=".background.OminService"
+            android:name=".connection.ConnectionService"
             android:enabled="true"
             android:exported="false" >
         </service>
