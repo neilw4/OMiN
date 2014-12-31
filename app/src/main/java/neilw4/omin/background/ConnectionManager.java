@@ -95,11 +95,13 @@ public class ConnectionManager {
      * @param state An integer defining the current connection state
      */
     private synchronized void setState(int state) {
-        Log.i(TAG, "setState() " + mState + " -> " + state);
-        mState = state;
+        if (mState != state) {
+            Log.v(TAG, "setState() " + mState + " -> " + state);
+            mState = state;
 
-        // Give the new state to the Handler so the UI Activity can update
-        mHandler.obtainMessage(MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+            // Give the new state to the Handler so the UI Activity can update
+            mHandler.obtainMessage(MESSAGE_STATE_CHANGE, state, -1).sendToTarget();
+        }
     }
 
     /**
@@ -114,7 +116,7 @@ public class ConnectionManager {
      * session in listening (server) mode. Called by the Activity onResume()
      */
     public synchronized void start() {
-        Log.i(TAG, "start");
+        Log.v(TAG, "start");
 
         // Cancel any thread attempting to make a connection
         if (mConnectThread != null) {
@@ -147,7 +149,7 @@ public class ConnectionManager {
      * @param device The BluetoothDevice to connect
      */
     public synchronized void connect(BluetoothDevice device) {
-        Log.i(TAG, "connect to: " + device);
+        Log.v(TAG, "connect to: " + device);
         boolean secure = device.getBondState() != BluetoothDevice.BOND_NONE;
 
         // Cancel any thread attempting to make a connection
@@ -178,7 +180,7 @@ public class ConnectionManager {
      */
     public synchronized void connected(BluetoothSocket socket, BluetoothDevice
             device, final String socketType, boolean connectedToServer) {
-        Log.i(TAG, "connected, Socket Type:" + socketType);
+        Log.v(TAG, "connected, Socket Type:" + socketType);
 
         // Cancel the thread that completed the connection
         if (mConnectThread != null) {
@@ -221,7 +223,7 @@ public class ConnectionManager {
      * Stop all threads
      */
     public synchronized void stop() {
-        Log.i(TAG, "stop");
+        Log.v(TAG, "stop");
 
         if (mConnectThread != null) {
             mConnectThread.cancel();
@@ -276,13 +278,9 @@ public class ConnectionManager {
     }
 
     /**
-     * Indicate that the connection was lost and notify the UI Activity.
+     * Indicate that the connection was lost.
      */
     private void connectionLost() {
-        // Send a failure message back to the Activity
-        Message msg = mHandler.obtainMessage(MESSAGE_FAILURE, "Device connection was lost");
-        mHandler.sendMessage(msg);
-
         // Start the service over to restart listening mode
         ConnectionManager.this.start();
     }
@@ -329,13 +327,13 @@ public class ConnectionManager {
                             NAME_INSECURE, MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + "listen() failed", e);
+                Log.v(TAG, "Socket Type: " + mSocketType + "listen() failed", e);
             }
             mmServerSocket = tmp;
         }
 
         public void run() {
-            Log.i(TAG, "Socket Type: " + mSocketType +
+            Log.v(TAG, "Socket Type: " + mSocketType +
                     "BEGIN mAcceptThread" + this);
             setName("AcceptThread" + mSocketType);
 
@@ -348,7 +346,7 @@ public class ConnectionManager {
                     // successful connection or an exception
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
-//                    Log.d(TAG, "Socket Type: " + mSocketType + "accept() failed", e);
+                    Log.v(TAG, "Socket Type: " + mSocketType + "accept() failed", e);
                     break;
                 }
 
@@ -375,16 +373,16 @@ public class ConnectionManager {
                     }
                 }
             }
-            Log.i(TAG, "END mAcceptThread, socket Type: " + mSocketType);
+            Log.v(TAG, "END mAcceptThread, socket Type: " + mSocketType);
 
         }
 
         public void cancel() {
-            Log.i(TAG, "Socket Type" + mSocketType + "cancel " + this);
+            Log.v(TAG, "Socket Type" + mSocketType + "cancel " + this);
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "Socket Type" + mSocketType + "close() of server failed", e);
+                Log.v(TAG, "Socket Type" + mSocketType + "close() of server failed", e);
             }
         }
     }
@@ -416,13 +414,13 @@ public class ConnectionManager {
                             MY_UUID_INSECURE);
                 }
             } catch (IOException e) {
-                Log.e(TAG, "Socket Type: " + mSocketType + "create() failed", e);
+                Log.v(TAG, "Socket Type: " + mSocketType + "create() failed", e);
             }
             mmSocket = tmp;
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
+            Log.v(TAG, "BEGIN mConnectThread SocketType:" + mSocketType);
             setName("ConnectThread" + mSocketType);
 
             // Always cancel discovery because it will slow down a connection
@@ -473,7 +471,7 @@ public class ConnectionManager {
         private final OutputStream mmOutStream;
 
         public ConnectedThread(BluetoothSocket socket, String socketType) {
-            Log.i(TAG, "create ConnectedThread: " + socketType);
+            Log.v(TAG, "create ConnectedThread: " + socketType);
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
@@ -491,7 +489,7 @@ public class ConnectionManager {
         }
 
         public void run() {
-            Log.i(TAG, "BEGIN mConnectedThread");
+            Log.v(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
 

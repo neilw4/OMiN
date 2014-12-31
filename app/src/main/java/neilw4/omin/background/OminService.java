@@ -142,6 +142,7 @@ public class OminService extends IntentService {
             Log.i(TAG, "didn't connect: invalid state " + (connection != null ? connection.getState() : null));
             return;
         }
+        visibleDevices.clear();
         if (ominDevices.isEmpty()) {
             Log.i(TAG, "no OMiN devices detected");
             return;
@@ -198,8 +199,10 @@ public class OminService extends IntentService {
     }
 
     protected void foundDevice(BluetoothDevice device) {
-        Log.i(TAG, "found device " + device.getName() + " (" + device.getAddress() + ")");
-        visibleDevices.put(device.getAddress(), device);
+        if (!visibleDevices.containsKey(device.getAddress())) {
+            Log.i(TAG, "found device " + device.getName() + " (" + device.getAddress() + ")");
+            visibleDevices.put(device.getAddress(), device);
+        }
     }
 
     protected void foundUuid(BluetoothDevice device, UUID uuid) {
@@ -212,16 +215,18 @@ public class OminService extends IntentService {
             visibleDevices.remove(address);
         }
 
-        if (ConnectionManager.uuidMatches(uuid)) {
-            Log.i(TAG, "found matching UUID for " + device.getName() + ": " + uuid);
+        if (ConnectionManager.uuidMatches(uuid) && !ominDevices.containsKey(address)) {
+            Log.i(TAG, device.getName() + " is an OMiN device");
             ominDevices.put(address, device);
             if (!recentDevices.contains(address) && connection.isListening()) {
+                Log.i(TAG, device.getName() + " not contacted recently. Connecting");
                 connect();
                 return;
             }
         }
 
-        if (visibleDevices.isEmpty() && connection.isListening()) {
+        if (visibleDevices.isEmpty() && connection.isListening() && !ominDevices.isEmpty()) {
+            Log.i("TAG", "Found all UUIDs. Connecting");
             connect();
         }
     }

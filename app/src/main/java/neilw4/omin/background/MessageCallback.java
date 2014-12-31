@@ -1,5 +1,6 @@
 package neilw4.omin.background;
 
+import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.os.Message;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.widget.Toast;
 
 public class MessageCallback implements Handler.Callback {
     public static final String TAG = MessageCallback.class.getSimpleName();
+//    private static final String END_CONNECTION = "MessageCallback.END_CONNECTION";
 
     private ConnectionManager connection;
 
@@ -24,7 +26,8 @@ public class MessageCallback implements Handler.Callback {
                     case ConnectionManager.STATE_CONNECTED:
                         Log.i(TAG, "connected to " + mConnectedDeviceName);
                         if (connection != null) {
-                            connection.write("HELLO WORLD!".getBytes());
+                            String name = BluetoothAdapter.getDefaultAdapter().getName();
+                            connection.write((name + " says HELLO WORLD!").getBytes());
                         } else {
                             Log.e(TAG, "Couldn't write message: connection doesn't exist");
                         }
@@ -48,14 +51,11 @@ public class MessageCallback implements Handler.Callback {
                 byte[] readBuf = (byte[]) msg.obj;
                 // construct a string from the valid bytes in the buffer
                 String readMessage = new String(readBuf, 0, msg.arg1);
-                Log.i(TAG, mConnectedDeviceName + ":  " + readMessage);
+                Log.i(TAG, mConnectedDeviceName + "(" + (connectedToServer ? "client" : "server") + "):  " + readMessage);
                 if (context != null) {
                     Toast.makeText(context, mConnectedDeviceName + "(" + (connectedToServer ? "client" : "server") + "): " + readMessage, Toast.LENGTH_LONG).show();
                 }
-                try {
-                    int i = Integer.parseInt(readMessage);
-                    connection.write(Integer.toString(i + 1).getBytes());
-                } catch (NumberFormatException e) {}
+                connection.disconnect();
                 break;
             case ConnectionManager.MESSAGE_DEVICE_NAME:
                 // save the connected device's name
