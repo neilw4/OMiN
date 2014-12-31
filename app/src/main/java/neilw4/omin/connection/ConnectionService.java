@@ -95,7 +95,6 @@ public class ConnectionService extends IntentService {
 
                 Log.i(TAG, "starting server");
                 connection = new ConnectionManager(connectionCallback);
-                connectionCallback.setConnection(connection);
                 connectionCallback.setContext(getBaseContext());
                 connection.start();
             }
@@ -114,7 +113,6 @@ public class ConnectionService extends IntentService {
                 connection.stop();
                 connection = null;
             }
-            connectionCallback.setConnection(null);
             connectionCallback.setContext(null);
         }
     }
