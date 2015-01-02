@@ -4,5 +4,16 @@ import com.orm.SugarRecord;
 
 public class User extends SugarRecord<User> {
     public String name;
-    private boolean interested;
+    public boolean interested = false;
+
+    public User(String name) {
+        this.name = name;
+    }
+
+    @SuppressWarnings("unused")
+    public User() {
+        // Sugar ORM requires an empty constructor.
+    }
+
+
 }

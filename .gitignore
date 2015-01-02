@@ -6,4 +6,6 @@
 /app/*.iml
 .DS_Store
 /build
-jpbc
+/jpbc
+/sugar
+/.idea/inspectionProfiles/*
