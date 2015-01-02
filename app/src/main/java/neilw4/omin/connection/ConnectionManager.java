@@ -57,11 +57,6 @@ public class ConnectionManager {
     public static final int STATE_CONNECTING = 2; // now initiating an outgoing connection
     public static final int STATE_CONNECTED = 3;  // now connected to a remote device
 
-    public interface ConnectionCallback {
-        public void onConnectedToServer(BluetoothDevice device, InputStream in, OutputStream out) throws IOException;
-        public void onConnectedToClient(BluetoothDevice device, InputStream in, OutputStream out) throws IOException;
-        public void onFailure(String msg);
-    }
 
     /**
      * Constructor. Prepares a new BluetoothChat session.
@@ -122,11 +117,9 @@ public class ConnectionManager {
         Log.v(TAG, "connect to: " + device);
 
         // Cancel any thread attempting to make a connection
-        if (mState == STATE_CONNECTING) {
-            if (mConnectThread != null) {
-                mConnectThread.cancel();
-                mConnectThread = null;
-            }
+        if (mState == STATE_CONNECTING && mConnectThread != null) {
+            mConnectThread.cancel();
+            mConnectThread = null;
         }
 
         // Start the thread to connect with the given device
@@ -244,10 +237,9 @@ public class ConnectionManager {
             Log.v(TAG, "BEGIN mAcceptThread" + this);
             setName("AcceptThread");
 
-            BluetoothSocket socket = null;
-
             // Listen to the server socket if we're not connected
             while (mState != STATE_CONNECTED) {
+                BluetoothSocket socket;
                 try {
                     // This is a blocking call and will only return on a
                     // successful connection or an exception
@@ -359,4 +351,9 @@ public class ConnectionManager {
         }
     }
 
+    public interface ConnectionCallback {
+        void onConnectedToServer(BluetoothDevice device, InputStream in, OutputStream out) throws IOException;
+        void onConnectedToClient(BluetoothDevice device, InputStream in, OutputStream out) throws IOException;
+        void onFailure(String msg);
+    }
 }

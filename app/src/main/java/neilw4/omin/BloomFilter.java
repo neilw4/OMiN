@@ -51,7 +51,6 @@ public class BloomFilter<T> {
         if (hash < 0) {
             hash *= -1;
         }
-        System.out.println(t + " (" + n + "): " + t.hashCode() + " -> " + hash % cells.length);
         return hash % cells.length;
     }
 

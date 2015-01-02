@@ -38,9 +38,9 @@ public class UserId extends SugarRecord<UserId> {
             UserId child = Select.from(UserId.class).where(
                     Condition.prop("uname").eq(uid),
                     userId == null ?
-                        Condition.prop("parent").notLike("%"): // Sugar doesn't support IS NULL yet.
-                        Condition.prop("parent").eq(userId.getId())
-                ).first();
+                            Condition.prop("parent").notLike("%") : // Sugar doesn't support IS NULL yet.
+                            Condition.prop("parent").eq(userId.getId())
+            ).first();
 
             if (child == null) {
                 // ID doesn't exist - create it.

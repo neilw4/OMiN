@@ -11,26 +11,26 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ConnectionServiceStarter extends BroadcastReceiver {
-    public static String TAG = ConnectionServiceStarter.class.getSimpleName();
+    public static final String TAG = ConnectionServiceStarter.class.getSimpleName();
 
-    private static List<String> ENABLE_ACTIONS = Arrays.asList(
+    private static final List<String> ENABLE_ACTIONS = Arrays.asList(
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_MY_PACKAGE_REPLACED,
             Intent.ACTION_BATTERY_OKAY
     );
 
-    private static List<String> DISABLE_ACTIONS = Arrays.asList(
+    private static final List<String> DISABLE_ACTIONS = Arrays.asList(
             Intent.ACTION_BATTERY_LOW
     );
 
-    private static List<String> PASS_ACTIONS = Arrays.asList(
+    private static final List<String> PASS_ACTIONS = Arrays.asList(
             BluetoothAdapter.ACTION_DISCOVERY_STARTED,
             BluetoothAdapter.ACTION_DISCOVERY_FINISHED,
             BluetoothDevice.ACTION_FOUND,
             BluetoothDevice.ACTION_UUID
     );
 
-    private static String BLUETOOTH_STATE_CHANGED_ACTION = BluetoothAdapter.ACTION_STATE_CHANGED;
+    private static final String BLUETOOTH_STATE_CHANGED_ACTION = BluetoothAdapter.ACTION_STATE_CHANGED;
 
     public static void start(Context context) {
         Log.i(TAG, "Starting bluetooth services");

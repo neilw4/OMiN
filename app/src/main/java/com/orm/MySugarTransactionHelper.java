@@ -16,16 +16,16 @@ public class MySugarTransactionHelper {
         database.beginTransaction();
         try {
             Log.d(SugarTransactionHelper.class.getSimpleName(), "callback executing within transaction");
-            T retval = callback.manipulateInTransaction();
+            T result = callback.manipulateInTransaction();
             database.setTransactionSuccessful();
             Log.d(SugarTransactionHelper.class.getSimpleName(), "callback successfully executed within transaction");
-            return retval;
+            return result;
         } finally {
             database.endTransaction();
         }
     }
 
-    public static interface Callback<T> {
+    public interface Callback<T> {
         T manipulateInTransaction() throws IOException;
     }
 }
