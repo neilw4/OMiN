@@ -1,11 +1,9 @@
 .gradle
 /local.properties
-/.idea/workspace.xml
-/.idea/libraries
+/.idea
 /*.iml
 /app/*.iml
 .DS_Store
 /build
 /jpbc
 /sugar
-/.idea/inspectionProfiles/*
