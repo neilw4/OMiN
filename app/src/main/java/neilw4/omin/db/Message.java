@@ -2,6 +2,7 @@ package neilw4.omin.db;
 
 import android.util.JsonReader;
 import android.util.JsonWriter;
+import android.util.Log;
 
 import com.orm.MySugarTransactionHelper;
 import com.orm.SugarRecord;
@@ -11,26 +12,31 @@ import com.orm.query.Select;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringWriter;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import static junit.framework.Assert.*;
 
 public class Message extends SugarRecord<Message> {
 
-    public int distributionCount = 0;
+    public static final int MESSAGE_BUFFER_SIZE = 10;
+    public static final String TAG = Message.class.getSimpleName();
+
     public boolean read = false;
     public User fromUser;
     public String signature;
     public String body;
     public Timestamp sent;
+    public Timestamp lastSent = null;
 
     public Message(User fromUser, String signature, String body, Timestamp sent) {
         this.fromUser = fromUser;
         this.signature = signature;
         this.body = body;
         this.sent = sent;
+        this.lastSent = new Timestamp(new Date().getTime());
     }
 
     @SuppressWarnings("unused")
@@ -94,9 +100,52 @@ public class Message extends SugarRecord<Message> {
         writer.name("sent").value(sent.getTime());
         writer.endObject();
 
-        // Message is being sent, increment the distribution count.
-        distributionCount++;
+        // Record that the message is being sent.
+        lastSent = new Timestamp(new Date().getTime());
         save();
+    }
+
+    private void evict() {
+        try {
+            MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
+                @Override
+                public Void manipulateInTransaction() {
+                    Select<Message> buffer = Select.from(Message.class).orderBy("last_sent");
+                        while (buffer.count() > MESSAGE_BUFFER_SIZE) {
+                            Message evict = buffer.first();
+                            Log.d(TAG, "Evicted message " + evict);
+                            evict.delete();
+                        }
+                    return null;
+                }
+            });
+        } catch (IOException e) {
+            Log.e(TAG, "Failure running eviction strategy: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public void save() {
+        assertNotNull(fromUser);
+        assertNotNull(signature);
+        assertNotNull(body);
+        assertNotNull(sent);
+        super.save();
+
+        evict();
+    }
+
+    @Override
+    public String toString() {
+        StringWriter stringWriter = new StringWriter();
+        JsonWriter jsonWriter = new JsonWriter(stringWriter);
+        try {
+            write(jsonWriter);
+            jsonWriter.close();
+        } catch (IOException e) {
+            return body;
+        }
+        return stringWriter.toString();
     }
 
 }
