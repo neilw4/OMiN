@@ -7,10 +7,13 @@ import com.orm.SugarRecord;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
+import static junit.framework.Assert.*;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class UserId extends SugarRecord<UserId> {
 
@@ -119,6 +122,12 @@ public class UserId extends SugarRecord<UserId> {
             writer.value(id);
         }
         writer.endArray();
+    }
+
+    @Override
+    public void save() {
+        assertTrue(Pattern.matches("[a-z]+", uname));
+        super.save();
     }
 
 }

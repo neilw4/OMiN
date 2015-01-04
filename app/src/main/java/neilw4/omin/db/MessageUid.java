@@ -8,6 +8,10 @@ import com.orm.query.Select;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
+
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
 
 public class MessageUid extends SugarRecord<MessageUid> {
 
@@ -47,6 +51,13 @@ public class MessageUid extends SugarRecord<MessageUid> {
             msgUid.uid.write(writer);
         }
         writer.endArray();
+    }
+
+    @Override
+    public void save() {
+        assertNotNull(uid);
+        assertNotNull(msg);
+        super.save();
     }
 
 }
