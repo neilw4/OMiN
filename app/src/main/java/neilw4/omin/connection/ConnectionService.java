@@ -38,6 +38,11 @@ public class ConnectionService extends IntentService {
     private static PendingIntent repeatingIntent = null;
 
     public static void start(Context context) {
+        if (BluetoothAdapter.getDefaultAdapter() == null) {
+            Log.w(TAG, "Could not start service: bluetooth adapter not available");
+            return;
+        }
+
         if (repeatingIntent == null) {
             Intent startIntent = new Intent(context, ConnectionService.class);
             startIntent.setAction(ACTION_START);
