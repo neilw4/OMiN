@@ -14,7 +14,8 @@ import neilw4.omin.connection.ConnectionServiceStarter;
 
 public class MainActivity extends Activity {
 
-    private UnameManager unameManager = new UnameManager(this);
+    public UnameManager unameManager = new UnameManager(this);
+    public SendMessageManager sendMessageManager = new SendMessageManager(this);
 
 
     @Override
@@ -25,7 +26,7 @@ public class MainActivity extends Activity {
         ConnectionServiceStarter.start(this);
 
         unameManager.setup();
-
+        sendMessageManager.setup();
     }
 
 }
