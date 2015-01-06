@@ -12,14 +12,13 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/uname_layout"
         android:layout_marginBottom="@dimen/activity_horizontal_margin">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/set_username"
-            android:id="@+id/uname_set"
+            android:id="@+id/uname_button"
             android:layout_alignParentRight="true"/>
 
         <EditText
@@ -27,8 +26,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/uname_text"
             android:layout_marginRight="@dimen/activity_vertical_margin"
-            android:layout_alignBaseline="@id/uname_set"
-            android:layout_toLeftOf="@+id/uname_set"/>
+            android:layout_alignBaseline="@id/uname_button"
+            android:layout_toLeftOf="@+id/uname_button"/>
 
     </RelativeLayout>
 
@@ -36,7 +35,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
-        android:id="@+id/new_message_contents"
+        android:id="@+id/send_message_text"
         android:ems="10"
         android:layout_marginTop="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/activity_horizontal_margin"/>
@@ -45,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Send Message"
-            android:id="@+id/new_message_send"
+            android:id="@+id/send_message_button"
             android:layout_gravity="right"/>
 
 </LinearLayout>

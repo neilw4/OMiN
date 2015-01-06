@@ -24,15 +24,12 @@ public class Message extends SugarRecord<Message> {
     public static final int MESSAGE_BUFFER_SIZE = 10;
     public static final String TAG = Message.class.getSimpleName();
 
-    public boolean read = false;
-    public User fromUser;
     public String signature;
     public String body;
     public Timestamp sent;
     public Timestamp lastSent = null;
 
-    public Message(User fromUser, String signature, String body, Timestamp sent) {
-        this.fromUser = fromUser;
+    public Message(String signature, String body, Timestamp sent) {
         this.signature = signature;
         this.body = body;
         this.sent = sent;
@@ -66,8 +63,6 @@ public class Message extends SugarRecord<Message> {
         assertEquals("fromUser", reader.nextName());
         List<UserId> uids = UserId.readUids(reader);
         assertFalse(uids.isEmpty());
-        // All uids point to the same user.
-        User fromUser = uids.get(0).user;
 
         assertEquals("signature", reader.nextName());
         String signature = reader.nextString();
@@ -84,7 +79,7 @@ public class Message extends SugarRecord<Message> {
 
         if (msg == null) {
             // Message doesn't exist in database - create it.
-            msg = new Message(fromUser, signature, body, sent);
+            msg = new Message(signature, body, sent);
             msg.save();
             MessageUid.makeMsgUids(uids, msg);
         }
@@ -126,7 +121,6 @@ public class Message extends SugarRecord<Message> {
 
     @Override
     public void save() {
-        assertNotNull(fromUser);
         assertNotNull(signature);
         assertNotNull(body);
         assertNotNull(sent);

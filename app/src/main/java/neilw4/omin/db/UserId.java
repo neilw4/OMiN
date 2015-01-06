@@ -57,6 +57,10 @@ public class UserId extends SugarRecord<UserId> {
         return userId;
     }
 
+    public static boolean valid(String uname) {
+        return Pattern.matches("[a-z]+", uname);
+    }
+
     protected static List<UserId> readUids(final JsonReader reader) throws IOException {
         reader.beginArray();
 
@@ -127,7 +131,7 @@ public class UserId extends SugarRecord<UserId> {
     @Override
     public void save() {
         assertNotNull(uname);
-        assertTrue(Pattern.matches("[a-z]+", uname));
+        assertTrue(valid(uname));
         super.save();
     }
 

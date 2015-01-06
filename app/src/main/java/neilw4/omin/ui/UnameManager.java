@@ -26,9 +26,10 @@ public class UnameManager {
 
     public static final String TAG = UnameManager.class.getSimpleName();
 
+    private final Activity context;
+
     private EditText unameText;
-    private Button unameSet;
-    private Activity context;
+    private Button unameButton;
 
     public UnameManager(Activity context) {
         this.context = context;
@@ -36,9 +37,9 @@ public class UnameManager {
 
     public void setup() {
         unameText = (EditText)context.findViewById(R.id.uname_text);
-        unameSet = (Button)context.findViewById(R.id.uname_set);
+        unameButton = (Button)context.findViewById(R.id.uname_button);
 
-        unameSet.setOnClickListener(new View.OnClickListener() {
+        unameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 setUname(unameText.getText().toString());
@@ -59,14 +60,12 @@ public class UnameManager {
         PrivateKey myKey = getKey();
         if (myKey != null) {
             unameText.setText(myKey.uid.uname);
-        } else {
-            unameText.setText("");
         }
     }
 
     public void setUname(final String uname) {
         assertNotNull(uname);
-        assertTrue(Pattern.matches("[a-z]+", uname));
+        assertTrue(UserId.valid(uname));
         SugarTransactionHelper.doInTansaction(new SugarTransactionHelper.Callback() {
             @Override
             public void manipulateInTransaction() {
@@ -121,9 +120,11 @@ public class UnameManager {
     private void setButtonEnabled(String newUname) {
         PrivateKey myKey = getKey();
         if (myKey != null && newUname.equals(myKey.uid.uname)) {
-            unameSet.setEnabled(false);
+            unameButton.setEnabled(false);
+        } else if (!UserId.valid(newUname)) {
+            unameButton.setEnabled(false);
         } else {
-            unameSet.setEnabled(true);
+            unameButton.setEnabled(true);
         }
 
     }
