@@ -18,14 +18,13 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Set Username"
             android:id="@+id/uname_set"
             android:layout_alignParentRight="true"/>
 
         <EditText
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/editText"
+            android:id="@+id/uname_text"
             android:layout_marginRight="@dimen/activity_vertical_margin"
             android:layout_alignBaseline="@id/uname_set"
             android:layout_toLeftOf="@+id/uname_set"/>

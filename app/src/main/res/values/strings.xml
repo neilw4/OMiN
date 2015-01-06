@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">OMiN</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="set_username">Set Username</string>
+    <string name="add_username">Add Username</string>
 
 </resources>
