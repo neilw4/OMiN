@@ -126,6 +126,7 @@ public class UserId extends SugarRecord<UserId> {
 
     @Override
     public void save() {
+        assertNotNull(uname);
         assertTrue(Pattern.matches("[a-z]+", uname));
         super.save();
     }

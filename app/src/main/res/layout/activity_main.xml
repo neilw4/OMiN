@@ -18,6 +18,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/set_username"
             android:id="@+id/uname_set"
             android:layout_alignParentRight="true"/>
 
