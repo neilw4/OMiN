@@ -16,6 +16,7 @@ public class MainActivity extends Activity {
 
     public UnameManager unameManager = new UnameManager(this);
     public SendMessageManager sendMessageManager = new SendMessageManager(this);
+    public ViewMessageManager viewMessageManager = new ViewMessageManager(this);
 
 
     @Override
@@ -27,6 +28,7 @@ public class MainActivity extends Activity {
 
         unameManager.setup();
         sendMessageManager.setup();
+        viewMessageManager.setup();
     }
 
 }
