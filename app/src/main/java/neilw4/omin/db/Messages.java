@@ -14,10 +14,12 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
-public class Messages {
+public final class Messages {
 
     public static final int MAX_MESSAGES = 10;
 
+    // Private constructor to avoid instantiation.
+    private Messages() {}
 
     public static void read(InputStream in) throws IOException {
         final JsonReader reader = new JsonReader(new InputStreamReader(in));
