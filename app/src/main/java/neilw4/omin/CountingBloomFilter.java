@@ -1,25 +1,29 @@
 package neilw4.omin;
 
-public class BinaryBloomFilter<T> {
+public class CountingBloomFilter<T> {
 
-    private final long[] cells;
+    private final int[] cells;
     private final int hashes;
+    private final int cellVals;
 
-    public BinaryBloomFilter(int cellCount, int hashes) {
-        cells = new long[cellCount / Long.SIZE];
+    public CountingBloomFilter(int cellCount, int hashes, int cellVals) {
+        cells = new int[cellCount];
         this.hashes = hashes;
+        this.cellVals = cellVals;
+    }
+
+    public CountingBloomFilter(int cells, int hashes) {
+        this(cells, hashes, 2);
     }
 
     public boolean put(T t) {
         boolean exists = true;
         for (int i = 0; i < hashes; i++) {
             int hash = hash(t, i);
-            int cell = hash / Long.SIZE;
-            int mask = 0x1 << (hash % Long.SIZE);
-            if ((cells[cell] & mask) == 0) {
+            if (cells[hash] == 0) {
                 exists = false;
             }
-            cells[cell] &= mask;
+            cells[hash] = cellVals - 1;
         }
         return exists;
     }
@@ -27,13 +31,19 @@ public class BinaryBloomFilter<T> {
     public boolean mayContain(T t) {
         for (int i = 0; i < hashes; i++) {
             int hash = hash(t, i);
-            int cell = hash / Long.SIZE;
-            int mask = 0x1 << (hash % Long.SIZE);
-            if ((cells[cell] & mask) == 0) {
+            if (cells[hash] == 0) {
                 return false;
             }
         }
         return true;
+    }
+
+    public void reduce() {
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] > 0) {
+                cells[i]--;
+            }
+        }
     }
 
     private int hash(T t, int n) {
@@ -41,7 +51,7 @@ public class BinaryBloomFilter<T> {
         if (hash < 0) {
             hash *= -1;
         }
-        return hash % (cells.length * Long.SIZE);
+        return hash % cells.length;
     }
 
 }

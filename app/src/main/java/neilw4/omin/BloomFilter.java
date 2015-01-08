@@ -1,49 +1,47 @@
 package neilw4.omin;
 
+import java.util.List;
+
 public class BloomFilter<T> {
 
-    private final int[] cells;
+    private final long[] cells;
     private final int hashes;
-    private final int cellVals;
 
-    public BloomFilter(int cellCount, int hashes, int cellVals) {
-        cells = new int[cellCount];
+    public BloomFilter(int cellCount, int hashes) {
+        cells = new long[cellCount / Long.SIZE];
         this.hashes = hashes;
-        this.cellVals = cellVals;
-    }
-
-    public BloomFilter(int cells, int hashes) {
-        this(cells, hashes, 2);
     }
 
     public boolean put(T t) {
         boolean exists = true;
         for (int i = 0; i < hashes; i++) {
             int hash = hash(t, i);
-            if (cells[hash] == 0) {
+            int cell = hash / Long.SIZE;
+            int mask = 0x1 << (hash % Long.SIZE);
+            if ((cells[cell] & mask) == 0) {
                 exists = false;
             }
-            cells[hash] = cellVals - 1;
+            cells[cell] &= mask;
         }
         return exists;
+    }
+
+    public void put(List<T> ts) {
+        for (T t: ts) {
+            put(t);
+        }
     }
 
     public boolean mayContain(T t) {
         for (int i = 0; i < hashes; i++) {
             int hash = hash(t, i);
-            if (cells[hash] == 0) {
+            int cell = hash / Long.SIZE;
+            int mask = 0x1 << (hash % Long.SIZE);
+            if ((cells[cell] & mask) == 0) {
                 return false;
             }
         }
         return true;
-    }
-
-    public void reduce() {
-        for (int i = 0; i < cells.length; i++) {
-            if (cells[i] > 0) {
-                cells[i]--;
-            }
-        }
     }
 
     private int hash(T t, int n) {
@@ -51,7 +49,7 @@ public class BloomFilter<T> {
         if (hash < 0) {
             hash *= -1;
         }
-        return hash % cells.length;
+        return hash % (cells.length * Long.SIZE);
     }
 
 }
