@@ -2,7 +2,6 @@ package neilw4.omin.db;
 
 import android.util.JsonReader;
 import android.util.JsonWriter;
-import android.util.Log;
 
 import com.orm.MySugarTransactionHelper;
 import com.orm.SugarRecord;
@@ -21,7 +20,6 @@ import static junit.framework.Assert.*;
 
 public class Message extends SugarRecord<Message> {
 
-    public static final int MESSAGE_BUFFER_SIZE = 10;
     public static final String TAG = Message.class.getSimpleName();
 
     public String signature;
@@ -39,21 +37,6 @@ public class Message extends SugarRecord<Message> {
     @SuppressWarnings("unused")
     public Message() {
         // Sugar ORM requires an empty constructor.
-    }
-
-    public static Message read(InputStream in) throws IOException {
-        final JsonReader reader = new JsonReader(new InputStreamReader(in));
-        try {
-            reader.setLenient(false);
-            return MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Message>() {
-                @Override
-                public Message manipulateInTransaction() throws IOException {
-                    return read(reader);
-                }
-            });
-        } finally {
-            reader.close();
-        }
     }
 
     public static Message read(JsonReader reader) throws IOException {
@@ -100,25 +83,6 @@ public class Message extends SugarRecord<Message> {
         save();
     }
 
-    private void evict() {
-        try {
-            MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
-                @Override
-                public Void manipulateInTransaction() {
-                    Select<Message> buffer = Select.from(Message.class).orderBy("last_sent");
-                        while (buffer.count() > MESSAGE_BUFFER_SIZE) {
-                            Message evict = buffer.first();
-                            Log.d(TAG, "Evicted message " + evict);
-                            evict.delete();
-                        }
-                    return null;
-                }
-            });
-        } catch (IOException e) {
-            Log.e(TAG, "Failure running eviction strategy: " + e.getMessage());
-        }
-    }
-
     @Override
     public void save() {
         assertNotNull(signature);
@@ -126,7 +90,7 @@ public class Message extends SugarRecord<Message> {
         assertNotNull(sent);
         super.save();
 
-        evict();
+        Messages.evict();
     }
 
     @Override
@@ -140,6 +104,11 @@ public class Message extends SugarRecord<Message> {
             return body;
         }
         return stringWriter.toString();
+    }
+
+    @Override
+    public int hashCode() {
+        return signature.hashCode() ^ body.hashCode() ^ (int)sent.getTime();
     }
 
 }
