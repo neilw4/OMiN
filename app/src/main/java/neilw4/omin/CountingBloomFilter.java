@@ -38,9 +38,19 @@ public class CountingBloomFilter<T> {
         return true;
     }
 
+    public BloomFilter<T> asBinaryFilter() {
+        BloomFilter<T> filter = new BloomFilter<>(cells.length, hashes);
+        for (int i = 0; i < cells.length; i++) {
+            if (cells[i] != 0) {
+                filter.setCells(i);
+            }
+        }
+        return filter;
+    }
+
     public void reduce() {
         for (int i = 0; i < cells.length; i++) {
-            if (cells[i] > 0) {
+            if (cells[i] != 0) {
                 cells[i]--;
             }
         }
