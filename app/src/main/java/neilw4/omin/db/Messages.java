@@ -5,6 +5,8 @@ import android.util.JsonWriter;
 import android.util.Log;
 
 import com.orm.MySugarTransactionHelper;
+import com.orm.SugarRecord;
+import com.orm.SugarTransactionHelper;
 import com.orm.query.Select;
 
 import java.io.IOException;
@@ -14,7 +16,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
-public final class Messages {
+import neilw4.omin.BloomFilter;
+
+public final class Messages extends SugarRecord<Messages> {
 
     public static final int MAX_MESSAGES = 10;
 
@@ -79,5 +83,30 @@ public final class Messages {
         } catch (IOException e) {
             Log.e(Message.TAG, "Failure running eviction strategy: " + e.getMessage());
         }
+    }
+
+    public String filter;
+
+    public static BloomFilter<Message> getFilter() {
+        Messages messages = Select.from(Messages.class).first();
+        if (messages == null) {
+            return new BloomFilter<>(256, 2);
+        } else {
+            return new BloomFilter<>(messages.filter);
+        }
+    }
+
+    public static void setFilter(final BloomFilter<Message> filter) {
+        SugarTransactionHelper.doInTansaction(new SugarTransactionHelper.Callback() {
+            @Override
+            public void manipulateInTransaction() {
+                Messages messages = Select.from(Messages.class).first();
+                if (messages == null) {
+                    messages = new Messages();
+                }
+                messages.filter = filter.toString();
+                messages.save();
+            }
+        });
     }
 }
