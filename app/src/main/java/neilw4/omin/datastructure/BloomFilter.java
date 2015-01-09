@@ -1,4 +1,4 @@
-package neilw4.omin;
+package neilw4.omin.datastructure;
 
 import android.util.JsonReader;
 import android.util.JsonWriter;

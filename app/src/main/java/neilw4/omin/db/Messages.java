@@ -16,7 +16,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
-import neilw4.omin.BloomFilter;
+import neilw4.omin.datastructure.BloomFilter;
 
 public final class Messages extends SugarRecord<Messages> {
 
