@@ -6,7 +6,9 @@ import android.util.JsonWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.security.SecureRandom;
 import java.util.List;
+import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -18,6 +20,14 @@ public class BloomFilter<T> {
 
     public BloomFilter(int cellCount, int hashes) {
         this(cellCount, hashes, new long[(cellCount - 1) / Long.SIZE + 1]);
+
+        // Randomise initial values for obfuscation.
+        Random r = new SecureRandom();
+        for (int i = 0; i < cellCount; i++) {
+            if (r.nextBoolean()) {
+                setCells(i);
+            }
+        }
     }
 
     private BloomFilter(int cellCount, int hashes, long[] cells) {
