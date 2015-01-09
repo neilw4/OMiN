@@ -3,18 +3,17 @@ package neilw4.omin.db;
 import android.util.JsonReader;
 import android.util.JsonWriter;
 
-import com.orm.MySugarTransactionHelper;
 import com.orm.SugarRecord;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+
+import neilw4.omin.datastructure.BloomFilter;
 
 import static junit.framework.Assert.*;
 
@@ -89,6 +88,10 @@ public class Message extends SugarRecord<Message> {
         assertNotNull(body);
         assertNotNull(sent);
         super.save();
+
+        BloomFilter<Message> filter = Messages.getFilter();
+        filter.put(this);
+        Messages.setFilter(filter);
 
         Messages.evict();
     }

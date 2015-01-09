@@ -12,8 +12,6 @@ import com.orm.SugarTransactionHelper;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
-import java.util.regex.Pattern;
-
 import neilw4.omin.R;
 
 import neilw4.omin.db.PrivateKey;

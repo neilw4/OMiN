@@ -7,7 +7,10 @@ import java.io.IOException;
 
 // Modified version of SugarTransactionHelper.
 // https://github.com/satyan/sugar/blob/v1.3/library/src/com/orm/MySugarTransactionHelper.java
-public class MySugarTransactionHelper {
+public final class MySugarTransactionHelper {
+
+    // Avoid instantiation.
+    private MySugarTransactionHelper() {}
 
     public static <T> T doInTransaction(Callback<T> callback) throws IOException {
 

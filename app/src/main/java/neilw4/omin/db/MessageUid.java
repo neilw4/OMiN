@@ -8,10 +8,8 @@ import com.orm.query.Select;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Pattern;
 
-import static junit.framework.Assert.assertNotNull;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 public class MessageUid extends SugarRecord<MessageUid> {
 
