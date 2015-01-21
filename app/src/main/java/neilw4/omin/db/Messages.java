@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.util.List;
 
 import neilw4.omin.datastructure.BloomFilter;
@@ -92,7 +93,9 @@ public final class Messages extends SugarRecord<Messages> {
         if (messages == null) {
             return new BloomFilter<>(256, 2);
         } else {
-            return new BloomFilter<>(messages.filter);
+            StringReader stringReader = new StringReader(messages.filter);
+            JsonReader jsonReader = new JsonReader(stringReader);
+            return BloomFilter.read(jsonReader);
         }
     }
 

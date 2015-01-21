@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import neilw4.omin.datastructure.BloomFilter;
+
 public class UserId extends SugarRecord<UserId> {
 
     public User user;
@@ -133,6 +135,32 @@ public class UserId extends SugarRecord<UserId> {
         assertNotNull(uname);
         assertTrue(valid(uname));
         super.save();
+    }
+
+
+    public static BloomFilter<UserId> interestedUserIds() {
+        BloomFilter<UserId> filter = new BloomFilter<UserId>(20, 2);
+        for (User user: User.interestedUsers()) {
+            for (UserId id: Select.from(UserId.class).where(Condition.prop("user").eq(user.getId())).list()) {
+                filter.put(id);
+            }
+        }
+        return filter;
+    }
+
+
+    @Override
+    public String toString() {
+        if (parent != null) {
+            return parent.toString() + "/" + uname;
+        } else {
+            return uname;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
     }
 
 }

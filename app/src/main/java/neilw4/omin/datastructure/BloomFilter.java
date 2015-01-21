@@ -4,13 +4,13 @@ import android.util.JsonReader;
 import android.util.JsonWriter;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 public class BloomFilter<T> {
 
@@ -33,43 +33,34 @@ public class BloomFilter<T> {
     private BloomFilter(int cellCount, int hashes, long[] cells) {
         this.cellCount = cellCount;
         this.hashes = hashes;
+        assertTrue(cells.length >= (cellCount - 1) / Long.SIZE + 1);
         this.cells = cells.clone();
     }
 
-    public BloomFilter(String str) {
-        StringReader stringReader = new StringReader(str);
+    public static <T> BloomFilter<T> read(JsonReader reader) {
         try {
-            JsonReader reader = new JsonReader(stringReader);
-            reader.setLenient(false);
-
             reader.beginObject();
             assertEquals("cellCount", reader.nextName());
-            cellCount = reader.nextInt();
+            int cellCount = reader.nextInt();
             assertEquals("hashes", reader.nextName());
-            hashes = reader.nextInt();
+            int hashes = reader.nextInt();
             assertEquals("cells", reader.nextName());
             reader.beginArray();
-            cells = new long[(cellCount - 1) / Long.SIZE + 1];
+            long[] cells = new long[(cellCount - 1) / Long.SIZE + 1];
             for (int i = 0; i < cells.length; i++) {
                 cells[i] = reader.nextLong();
             }
             reader.endArray();
             reader.endObject();
-
-            reader.close();
-            stringReader.close();
+            return new BloomFilter<>(cellCount, hashes, cells);
         } catch (IOException e) {
             // This error can't be ignored.
             throw new RuntimeException(e);
         }
-
     }
 
-    @Override
-    public String toString() {
+    public void write(JsonWriter writer) {
         try {
-            StringWriter stringWriter = new StringWriter();
-            JsonWriter writer = new JsonWriter(stringWriter);
             writer.setLenient(false);
             writer.beginObject();
             writer.name("cellCount").value(cellCount);
@@ -81,8 +72,6 @@ public class BloomFilter<T> {
             }
             writer.endArray();
             writer.endObject();
-            writer.close();
-            return stringWriter.toString();
         } catch (IOException e) {
             // This error can't be ignored.
             throw new RuntimeException(e);
