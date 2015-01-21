@@ -5,12 +5,10 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.JsonReader;
 import android.util.JsonWriter;
-import android.util.Log;
+
 import android.widget.Toast;
 
 import com.orm.MySugarTransactionHelper;
-import com.orm.query.Condition;
-import com.orm.query.Select;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,8 +19,9 @@ import java.io.OutputStreamWriter;
 
 import neilw4.omin.connection.ConnectionManager;
 import neilw4.omin.datastructure.BloomFilter;
-import neilw4.omin.db.User;
 import neilw4.omin.db.UserId;
+
+import static neilw4.omin.Logger.*;
 
 public class ConnectionCallback implements ConnectionManager.ConnectionCallback {
     public static final String TAG = ConnectionCallback.class.getSimpleName();
@@ -36,13 +35,13 @@ public class ConnectionCallback implements ConnectionManager.ConnectionCallback 
 
     @Override
     public void onConnectedToServer(BluetoothDevice device, InputStream in, OutputStream out) throws IOException {
-        Log.i(TAG, "connected to server " + device.getName());
+        info(TAG, "connected to server " + device.getName());
         onConnected(device, in, out);
     }
 
     @Override
     public void onConnectedToClient(BluetoothDevice device, InputStream in, OutputStream out) throws IOException {
-        Log.i(TAG, "connected to client " + device.getName());
+        info(TAG, "connected to client " + device.getName());
         onConnected(device, in, out);
 
     }
@@ -71,7 +70,7 @@ public class ConnectionCallback implements ConnectionManager.ConnectionCallback 
     }
 
     public void onFailure(String msg) {
-        Log.e(TAG, "failure: " + msg);
+        error(TAG, "failure: " + msg);
     }
 
     private void toast(final String msg) {

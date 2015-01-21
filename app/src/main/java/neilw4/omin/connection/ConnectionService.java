@@ -10,7 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.ParcelUuid;
 import android.os.Parcelable;
-import android.util.Log;
+import static neilw4.omin.Logger.*;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import neilw4.omin.ConnectionCallback;
+import neilw4.omin.Logger;
 
 public class ConnectionService extends IntentService {
 
@@ -28,7 +29,7 @@ public class ConnectionService extends IntentService {
     public static final String ACTION_SCAN = "neilw4.omin.BluetoothService.SCAN";
 
     // Start bluetooth discovery after REPEAT_SECONDS seconds.
-    public static final int REPEAT_SECONDS = 300;
+    public static final int REPEAT_SECONDS = 30;
 
     public ConnectionService() {
         super(TAG);
@@ -39,7 +40,7 @@ public class ConnectionService extends IntentService {
 
     public static void start(Context context) {
         if (BluetoothAdapter.getDefaultAdapter() == null) {
-            Log.w(TAG, "Could not start service: bluetooth adapter not available");
+            warn(TAG, "Could not start service: bluetooth adapter not available");
             return;
         }
 
@@ -85,11 +86,12 @@ public class ConnectionService extends IntentService {
     private static Map<String, BluetoothDevice> ominDevices = new HashMap<>();
 
     protected synchronized void startServer() {
+        Logger.setupLog(this);
         if (connection == null) {
             BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
             if (adapter != null) {
                 if (adapter.getScanMode() != BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE) {
-                    Log.i(TAG, "making discoverable");
+                    info(TAG, "making discoverable");
                     // Make bluetooth discoverable.
                     Intent discoverableIntent = new
                             Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
@@ -98,7 +100,7 @@ public class ConnectionService extends IntentService {
                     startActivity(discoverableIntent);
                 }
 
-                Log.i(TAG, "starting server");
+                info(TAG, "starting server");
                 connection = new ConnectionManager(connectionCallback);
                 connectionCallback.setContext(getBaseContext());
                 connection.start();
@@ -110,7 +112,7 @@ public class ConnectionService extends IntentService {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         if (adapter != null) {
             if (adapter.isDiscovering()) {
-                Log.i(TAG, "cancelling discovery");
+                info(TAG, "cancelling discovery");
                 adapter.cancelDiscovery();
             }
 
@@ -124,10 +126,10 @@ public class ConnectionService extends IntentService {
 
     protected void connectToDevice(BluetoothDevice device) {
         if (connection == null || !connection.isListening()) {
-            Log.i(TAG, "didn't connect to " + device.getAddress() + ": invalid state " + (connection != null ? connection.getState() : null));
+            info(TAG, "didn't connect to " + device.getAddress() + ": invalid state " + (connection != null ? connection.getState() : null));
             return;
         }
-        Log.i(TAG, "connecting to " + device.getAddress());
+        info(TAG, "connecting to " + device.getAddress());
 
         visibleDevices.clear();
         ominDevices.clear();
@@ -146,47 +148,47 @@ public class ConnectionService extends IntentService {
 
     protected void connect() {
         if (connection == null || !connection.isListening()) {
-            Log.i(TAG, "didn't connect: invalid state " + (connection != null ? connection.getState() : null));
+            info(TAG, "didn't connect: invalid state " + (connection != null ? connection.getState() : null));
             return;
         }
         visibleDevices.clear();
         if (ominDevices.isEmpty()) {
-            Log.i(TAG, "no OMiN devices detected");
+            info(TAG, "no OMiN devices detected");
             return;
         }
         for (String address: ominDevices.keySet()) {
             if (!recentDevices.contains(address)) {
-                Log.i(TAG, "connecting to new device");
+                info(TAG, "connecting to new device");
                 connectToDevice(ominDevices.get(address));
                 return;
             }
         }
         for (String address: recentDevices) {
             if (ominDevices.containsKey(address)) {
-                Log.i(TAG, "connecting to previously seen device");
+                info(TAG, "connecting to previously seen device");
                 connectToDevice(ominDevices.get(address));
                 return;
             }
         }
-        Log.e(TAG, "no valid connection to be made out of ");
+        error(TAG, "no valid connection to be made out of ");
         for (BluetoothDevice d: ominDevices.values()) {
-            Log.e(TAG, d.getAddress());
+            error(TAG, d.getAddress());
         }
     }
 
     protected void startDiscovery() {
         BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
         if (!adapter.isDiscovering() && connection != null && connection.isListening()) {
-            Log.i(TAG, "started discovery");
+            info(TAG, "started discovery");
             adapter.startDiscovery();
         } else {
             if (!adapter.isDiscovering()) {
-                Log.i(TAG, "didn't start discovery: already discovering");
+                info(TAG, "didn't start discovery: already discovering");
             }
             if (connection == null) {
-                Log.i(TAG, "didn't start discovery: CM was null");
+                info(TAG, "didn't start discovery: CM was null");
             } else if (connection.isConnected()) {
-                Log.i(TAG, "didn't start discovery: already connected");
+                info(TAG, "didn't start discovery: already connected");
             }
         }
     }
@@ -198,7 +200,7 @@ public class ConnectionService extends IntentService {
 
     protected void endDiscovery() {
         if (connection != null && connection.isListening()) {
-            Log.i(TAG, "finished discovery");
+            info(TAG, "finished discovery");
             for (BluetoothDevice device: visibleDevices.values()) {
                 device.fetchUuidsWithSdp();
             }
@@ -207,14 +209,14 @@ public class ConnectionService extends IntentService {
 
     protected void foundDevice(BluetoothDevice device) {
         if (!visibleDevices.containsKey(device.getAddress())) {
-            Log.i(TAG, "found device " + device.getName() + " (" + device.getAddress() + ")");
+            info(TAG, "found device " + device.getName() + " (" + device.getAddress() + ")");
             visibleDevices.put(device.getAddress(), device);
         }
     }
 
     protected void foundUuid(BluetoothDevice device, UUID uuid) {
         if (uuid == null) {
-            Log.e(TAG, "UUID for " + device.getName() + " (" + device.getAddress() + ") was null");
+            error(TAG, "UUID for " + device.getName() + " (" + device.getAddress() + ") was null");
             return;
         }
         String address = device.getAddress();
@@ -223,17 +225,17 @@ public class ConnectionService extends IntentService {
         }
 
         if (ConnectionManager.uuidMatches(uuid) && !ominDevices.containsKey(address)) {
-            Log.i(TAG, device.getName() + " is an OMiN device");
+            info(TAG, device.getName() + " is an OMiN device");
             ominDevices.put(address, device);
             if (!recentDevices.contains(address) && connection.isListening()) {
-                Log.i(TAG, device.getName() + " not contacted recently. Connecting");
+                info(TAG, device.getName() + " not contacted recently. Connecting");
                 connect();
                 return;
             }
         }
 
         if (visibleDevices.isEmpty() && connection.isListening() && !ominDevices.isEmpty()) {
-            Log.i("TAG", "Found all UUIDs. Connecting");
+            info("TAG", "Found all UUIDs. Connecting");
             connect();
         }
     }
@@ -262,7 +264,7 @@ public class ConnectionService extends IntentService {
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
             endDiscovery();
         } else {
-            Log.e(TAG, "Unknown action: " + action);
+            error(TAG, "Unknown action: " + action);
         }
     }
 }

@@ -1,7 +1,7 @@
 package neilw4.omin.ui;
 
 import android.app.Activity;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +14,8 @@ import java.util.Date;
 import neilw4.omin.R;
 import neilw4.omin.db.Message;
 import neilw4.omin.db.PrivateKey;
+
+import static neilw4.omin.Logger.*;
 
 public class SendMessageManager {
     public static final String TAG = SendMessageManager.class.getSimpleName();
@@ -44,19 +46,19 @@ public class SendMessageManager {
         String body = msg_text.getText().toString();
 
         if (body.length() == 0) {
-            Log.w(TAG, "Couldn't send message: no content");
+            warn(TAG, "Couldn't send message: no content");
             return;
         }
 
         PrivateKey key = Select.from(PrivateKey.class).first();
         if (key == null) {
-            Log.w(TAG, "Couldn't send message: no user id");
+            warn(TAG, "Couldn't send message: no user id");
             return;
         }
 
         new Message("sig", body, new Timestamp(new Date().getTime())).save();
 
         msg_text.getText().clear();
-        Log.i(TAG, "send message: " + body);
+        info(TAG, "send message: " + body);
     }
 }

@@ -5,10 +5,12 @@ import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
+
 
 import java.util.Arrays;
 import java.util.List;
+
+import static neilw4.omin.Logger.*;
 
 public class ConnectionServiceStarter extends BroadcastReceiver {
     public static final String TAG = ConnectionServiceStarter.class.getSimpleName();
@@ -33,12 +35,12 @@ public class ConnectionServiceStarter extends BroadcastReceiver {
     private static final String BLUETOOTH_STATE_CHANGED_ACTION = BluetoothAdapter.ACTION_STATE_CHANGED;
 
     public static void start(Context context) {
-        Log.i(TAG, "Starting bluetooth services");
+        info(TAG, "Starting bluetooth services");
         ConnectionService.start(context);
     }
 
     public static void stop(Context context) {
-        Log.i(TAG, "Stopping bluetooth services");
+        info(TAG, "Stopping bluetooth services");
         ConnectionService.stop(context);
     }
 
@@ -68,7 +70,7 @@ public class ConnectionServiceStarter extends BroadcastReceiver {
         } else if (PASS_ACTIONS.contains(action)) {
             pass(context, intent);
         } else {
-            android.util.Log.e(TAG, "Unrecognised intent action: " + action);
+            error(TAG, "Unrecognised intent action: " + action);
         }
     }
 }

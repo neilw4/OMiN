@@ -3,6 +3,7 @@ package neilw4.omin.ui;
 import android.app.Activity;
 import android.os.Bundle;
 
+import neilw4.omin.Logger;
 import neilw4.omin.R;
 import neilw4.omin.connection.ConnectionServiceStarter;
 
@@ -18,6 +19,8 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Logger.setupLog(this);
 
         ConnectionServiceStarter.start(this);
 

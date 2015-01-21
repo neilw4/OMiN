@@ -3,6 +3,7 @@ package com.orm;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+
 import java.io.IOException;
 
 // Modified version of SugarTransactionHelper.
@@ -18,10 +19,10 @@ public final class MySugarTransactionHelper {
 
         database.beginTransaction();
         try {
-            Log.d(SugarTransactionHelper.class.getSimpleName(), "callback executing within transaction");
+            Log.i(SugarTransactionHelper.class.getSimpleName(), "callback executing within transaction");
             T result = callback.manipulateInTransaction();
             database.setTransactionSuccessful();
-            Log.d(SugarTransactionHelper.class.getSimpleName(), "callback successfully executed within transaction");
+            Log.i(SugarTransactionHelper.class.getSimpleName(), "callback successfully executed within transaction");
             return result;
         } finally {
             database.endTransaction();

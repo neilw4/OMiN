@@ -3,7 +3,7 @@ package neilw4.omin.ui;
 import android.app.Activity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +19,7 @@ import neilw4.omin.db.UserId;
 
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
+import static neilw4.omin.Logger.*;
 
 public class UnameManager {
 
@@ -86,12 +87,12 @@ public class UnameManager {
 
     private void deleteKey(PrivateKey key) {
         if (key != null) {
-            Log.i(TAG, "deleting key " + key.uid.uname);
+            info(TAG, "deleting key " + key.uid.uname);
             for (UserId toDelete = key.uid; toDelete != null; toDelete = toDelete.parent) {
-                Log.i(TAG, "checking parent id " + toDelete.uname);
+                info(TAG, "checking parent id " + toDelete.uname);
                 Select<UserId> children = Select.from(UserId.class).where(Condition.prop("parent").eq(toDelete.getId()));
                 if (children.count() == 0) {
-                    Log.i(TAG, "deleting parent id " + toDelete.uname);
+                    info(TAG, "deleting parent id " + toDelete.uname);
                     toDelete.delete();
                 }
             }
@@ -107,10 +108,10 @@ public class UnameManager {
 
         if (uid == null) {
             uid = new UserId(uname, null);
-            Log.i(TAG, "Created new uid " + uname);
+            info(TAG, "Created new uid " + uname);
             uid.save();
         } else {
-            Log.i(TAG, "Found existing uid " + uname);
+            info(TAG, "Found existing uid " + uname);
         }
         return uid;
     }

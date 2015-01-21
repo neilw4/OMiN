@@ -2,7 +2,7 @@ package neilw4.omin.db;
 
 import android.util.JsonReader;
 import android.util.JsonWriter;
-import android.util.Log;
+
 
 import com.orm.MySugarTransactionHelper;
 import com.orm.SugarRecord;
@@ -19,13 +19,16 @@ import java.util.List;
 
 import neilw4.omin.datastructure.BloomFilter;
 
+import static neilw4.omin.Logger.*;
+
 public final class Messages extends SugarRecord<Messages> {
 
     public static final int MAX_MESSAGES = 10;
 
-    // Private constructor to avoid instantiation.
-    private Messages() {}
-
+    @SuppressWarnings("unused")
+    public Messages() {
+        // Sugar ORM requires an empty constructor.
+    }
     public static void read(InputStream in) throws IOException {
         final JsonReader reader = new JsonReader(new InputStreamReader(in));
         try {
@@ -75,14 +78,14 @@ public final class Messages extends SugarRecord<Messages> {
                     Select<Message> buffer = Select.from(Message.class).orderBy("last_sent");
                     while (buffer.count() > MAX_MESSAGES) {
                         Message evict = buffer.first();
-                        Log.d(Message.TAG, "Evicted message " + evict);
+                        debug(Message.TAG, "Evicted message " + evict);
                         evict.delete();
                     }
                     return null;
                 }
             });
         } catch (IOException e) {
-            Log.e(Message.TAG, "Failure running eviction strategy: " + e.getMessage());
+            error(Message.TAG, "Failure running eviction strategy: " + e.getMessage());
         }
     }
 

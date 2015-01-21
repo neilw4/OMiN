@@ -26,7 +26,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
-import android.util.Log;
+import static neilw4.omin.Logger.*;
+
 
 /**
  * This class does all the work for setting up and managing Bluetooth
@@ -74,7 +75,7 @@ public class ConnectionManager {
      */
     private synchronized void setState(int state) {
         if (mState != state) {
-            Log.v(TAG, "setState() " + mState + " -> " + state);
+            verbose(TAG, "setState() " + mState + " -> " + state);
             mState = state;
         }
     }
@@ -91,7 +92,7 @@ public class ConnectionManager {
      * session in listening (server) mode. Called by the Activity onResume()
      */
     public synchronized void start() {
-        Log.v(TAG, "start");
+        verbose(TAG, "start");
 
         // Cancel any thread attempting to make a connection
         if (mConnectThread != null) {
@@ -114,7 +115,7 @@ public class ConnectionManager {
      * @param device The BluetoothDevice to connect
      */
     public synchronized void connect(BluetoothDevice device) {
-        Log.v(TAG, "connect to: " + device);
+        verbose(TAG, "connect to: " + device);
 
         // Cancel any thread attempting to make a connection
         if (mState == STATE_CONNECTING && mConnectThread != null) {
@@ -134,7 +135,7 @@ public class ConnectionManager {
      */
     public synchronized void connected(final BluetoothSocket socket, final BluetoothDevice
             device, final boolean connectedToServer) {
-        Log.v(TAG, "connected");
+        verbose(TAG, "connected");
 
         // Cancel the thread that completed the connection
         if (mConnectThread != null) {
@@ -159,7 +160,7 @@ public class ConnectionManager {
                 mCallback.onConnectedToClient(device, in, out);
             }
         } catch (IOException e) {
-            Log.e(TAG, "IOException during connection: " + e.getMessage());
+            error(TAG, "IOException during connection: " + e.getMessage());
         } finally {
             connectionLost();
         }
@@ -169,7 +170,7 @@ public class ConnectionManager {
      * Stop all threads
      */
     public synchronized void stop() {
-        Log.v(TAG, "stop");
+        verbose(TAG, "stop");
 
         if (mConnectThread != null) {
             mConnectThread.cancel();
@@ -228,13 +229,13 @@ public class ConnectionManager {
                 tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(
                         NAME, MY_UUID);
             } catch (IOException e) {
-                Log.v(TAG, "listen() failed", e);
+                verbose(TAG, "listen() failed" + e);
             }
             mmServerSocket = tmp;
         }
 
         public void run() {
-            Log.v(TAG, "BEGIN mAcceptThread" + this);
+            verbose(TAG, "BEGIN mAcceptThread" + this);
             setName("AcceptThread");
 
             // Listen to the server socket if we're not connected
@@ -245,7 +246,7 @@ public class ConnectionManager {
                     // successful connection or an exception
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
-                    Log.v(TAG, "accept() failed", e);
+                    verbose(TAG, "accept() failed", e);
                     break;
                 }
 
@@ -264,23 +265,23 @@ public class ConnectionManager {
                                 try {
                                     socket.close();
                                 } catch (IOException e) {
-                                    Log.e(TAG, "Could not close unwanted socket", e);
+                                    error(TAG, "Could not close unwanted socket", e);
                                 }
                                 break;
                         }
                     }
                 }
             }
-            Log.v(TAG, "END mAcceptThread");
+            verbose(TAG, "END mAcceptThread");
 
         }
 
         public void cancel() {
-            Log.v(TAG, "cancel " + this);
+            verbose(TAG, "cancel " + this);
             try {
                 mmServerSocket.close();
             } catch (IOException e) {
-                Log.v(TAG, "close() of server failed", e);
+                verbose(TAG, "close() of server failed", e);
             }
         }
     }
@@ -305,13 +306,13 @@ public class ConnectionManager {
                 tmp = device.createInsecureRfcommSocketToServiceRecord(
                         MY_UUID);
             } catch (IOException e) {
-                Log.v(TAG, "create() failed", e);
+                verbose(TAG, "create() failed", e);
             }
             mmSocket = tmp;
         }
 
         public void run() {
-            Log.v(TAG, "BEGIN mConnectThread");
+            verbose(TAG, "BEGIN mConnectThread");
             setName("ConnectThread");
 
             // Always cancel discovery because it will slow down a connection
@@ -327,7 +328,7 @@ public class ConnectionManager {
                 try {
                     mmSocket.close();
                 } catch (IOException e2) {
-                    Log.e(TAG, "unable to close() socket during connection failure", e2);
+                    error(TAG, "unable to close() socket during connection failure", e2);
                 }
                 connectionFailed();
                 return;
@@ -346,7 +347,7 @@ public class ConnectionManager {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                Log.e(TAG, "close() of connect socket failed", e);
+                error(TAG, "close() of connect socket failed", e);
             }
         }
     }
