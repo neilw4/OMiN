@@ -29,8 +29,7 @@ public final class Messages extends SugarRecord<Messages> {
     public Messages() {
         // Sugar ORM requires an empty constructor.
     }
-    public static void read(InputStream in) throws IOException {
-        final JsonReader reader = new JsonReader(new InputStreamReader(in));
+    public static void read(final JsonReader reader) throws IOException {
         try {
             reader.setLenient(false);
             reader.beginArray();
@@ -49,8 +48,7 @@ public final class Messages extends SugarRecord<Messages> {
         }
     }
 
-    public static void write(OutputStream out, final List<Message> messages) throws IOException {
-        final JsonWriter writer = new JsonWriter(new OutputStreamWriter(out));
+    public static void write(final JsonWriter writer, final List<Message> messages) throws IOException {
         try {
             writer.setLenient(false);
             writer.beginArray();
