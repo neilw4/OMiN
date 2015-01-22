@@ -23,8 +23,8 @@ import neilw4.omin.db.UserId;
 
 import static neilw4.omin.Logger.*;
 
-public class ConnectionCallback implements ConnectionManager.ConnectionCallback {
-    public static final String TAG = ConnectionCallback.class.getSimpleName();
+public class P2PConnection implements ConnectionManager.ConnectionCallback {
+    public static final String TAG = P2PConnection.class.getSimpleName();
 
     private Handler handler = new Handler();
     private Context context;

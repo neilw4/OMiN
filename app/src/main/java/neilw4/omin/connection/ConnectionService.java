@@ -17,7 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.UUID;
 
-import neilw4.omin.ConnectionCallback;
+import neilw4.omin.P2PConnection;
 import neilw4.omin.Logger;
 
 public class ConnectionService extends IntentService {
@@ -35,7 +35,7 @@ public class ConnectionService extends IntentService {
         super(TAG);
     }
 
-    private static ConnectionCallback connectionCallback = new ConnectionCallback();
+    private static P2PConnection p2PConnection = new P2PConnection();
     private static PendingIntent repeatingIntent = null;
 
     public static void start(Context context) {
@@ -101,8 +101,8 @@ public class ConnectionService extends IntentService {
                 }
 
                 info(TAG, "starting server");
-                connection = new ConnectionManager(connectionCallback);
-                connectionCallback.setContext(getBaseContext());
+                connection = new ConnectionManager(p2PConnection);
+                p2PConnection.setContext(getBaseContext());
                 connection.start();
             }
         }
@@ -120,7 +120,7 @@ public class ConnectionService extends IntentService {
                 connection.stop();
                 connection = null;
             }
-            connectionCallback.setContext(null);
+            p2PConnection.setContext(null);
         }
     }
 
