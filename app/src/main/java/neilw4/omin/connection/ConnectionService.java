@@ -29,7 +29,7 @@ public class ConnectionService extends IntentService {
     public static final String ACTION_SCAN = "neilw4.omin.BluetoothService.SCAN";
 
     // Start bluetooth discovery after REPEAT_SECONDS seconds.
-    public static final int REPEAT_SECONDS = 30;
+    public static final int REPEAT_SECONDS = 300;
 
     public ConnectionService() {
         super(TAG);
