@@ -9,6 +9,7 @@ import android.util.JsonWriter;
 import android.widget.Toast;
 
 import com.orm.MySugarTransactionHelper;
+import com.orm.query.Select;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,6 +20,8 @@ import java.io.OutputStreamWriter;
 
 import neilw4.omin.connection.ConnectionManager;
 import neilw4.omin.datastructure.BloomFilter;
+import neilw4.omin.db.Message;
+import neilw4.omin.db.Messages;
 import neilw4.omin.db.UserId;
 
 import static neilw4.omin.Logger.*;
@@ -63,10 +66,9 @@ public class P2PConnection implements ConnectionManager.ConnectionCallback {
         writer.flush();
 
         BloomFilter<UserId> partnerInterested = BloomFilter.read(jsonReader);
-        // send array of possible message signatures
-        // receive array possible message of signatures
-        // send messages
-        // receive messages
+
+        Messages.write(jsonWriter, Select.from(Message.class).list());
+        Messages.read(jsonReader);
     }
 
     public void onFailure(String msg) {
