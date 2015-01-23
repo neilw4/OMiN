@@ -12,6 +12,7 @@ import android.os.ParcelUuid;
 import android.os.Parcelable;
 import static neilw4.omin.Logger.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -143,7 +144,11 @@ public class ConnectionService extends IntentService {
         }
         recentDevices.add(address);
 
-        connection.connect(device);
+        try {
+            connection.connect(device);
+        } catch (IOException e) {
+            error(TAG, "Couldn't connect to device", e);
+        }
     }
 
     protected void connect() {

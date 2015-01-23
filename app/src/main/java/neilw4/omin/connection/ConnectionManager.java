@@ -104,8 +104,12 @@ public class ConnectionManager {
 
         // Start the thread to listen on a BluetoothServerSocket
         if (mAcceptThread == null) {
-            mAcceptThread = new AcceptThread();
-            mAcceptThread.start();
+            try {
+                mAcceptThread = new AcceptThread();
+                mAcceptThread.start();
+            } catch (IOException e) {
+                error(TAG, "cannot start AcceptThread", e);
+            }
         }
     }
 
@@ -114,7 +118,7 @@ public class ConnectionManager {
      *
      * @param device The BluetoothDevice to connect
      */
-    public synchronized void connect(BluetoothDevice device) {
+    public synchronized void connect(BluetoothDevice device) throws IOException {
         verbose(TAG, "connect to: " + device);
 
         // Cancel any thread attempting to make a connection
@@ -222,15 +226,11 @@ public class ConnectionManager {
         // The local server socket
         private final BluetoothServerSocket mmServerSocket;
 
-        public AcceptThread() {
+        public AcceptThread() throws IOException {
             BluetoothServerSocket tmp = null;
             // Create a new listening server socket
-            try {
-                tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(
-                        NAME, MY_UUID);
-            } catch (IOException e) {
-                verbose(TAG, "listen() failed" + e);
-            }
+            tmp = mAdapter.listenUsingInsecureRfcommWithServiceRecord(
+                    NAME, MY_UUID);
             mmServerSocket = tmp;
         }
 
@@ -296,18 +296,14 @@ public class ConnectionManager {
         private final BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
 
-        public ConnectThread(BluetoothDevice device) {
+        public ConnectThread(BluetoothDevice device) throws IOException {
             mmDevice = device;
             BluetoothSocket tmp = null;
 
             // Get a BluetoothSocket for a connection with the
             // given BluetoothDevice
-            try {
-                tmp = device.createInsecureRfcommSocketToServiceRecord(
-                        MY_UUID);
-            } catch (IOException e) {
-                verbose(TAG, "create() failed", e);
-            }
+            tmp = device.createInsecureRfcommSocketToServiceRecord(
+                    MY_UUID);
             mmSocket = tmp;
         }
 
