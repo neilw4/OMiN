@@ -11,6 +11,7 @@ import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
+import static neilw4.omin.Logger.*;
 
 public class BloomFilter<T> {
 
@@ -37,8 +38,7 @@ public class BloomFilter<T> {
         this.cells = cells.clone();
     }
 
-    public static <T> BloomFilter<T> read(JsonReader reader) {
-        try {
+    public static <T> BloomFilter<T> read(JsonReader reader) throws IOException {
             reader.beginObject();
             assertEquals("cellCount", reader.nextName());
             int cellCount = reader.nextInt();
@@ -53,15 +53,10 @@ public class BloomFilter<T> {
             reader.endArray();
             reader.endObject();
             return new BloomFilter<>(cellCount, hashes, cells);
-        } catch (IOException e) {
-            // This error can't be ignored.
-            throw new RuntimeException(e);
-        }
     }
 
     public void write(JsonWriter writer) {
         try {
-            writer.setLenient(false);
             writer.beginObject();
             writer.name("cellCount").value(cellCount);
             writer.name("hashes").value(hashes);
@@ -122,6 +117,15 @@ public class BloomFilter<T> {
             hash *= -1;
         }
         return hash % cellCount;
+    }
+
+    @Override
+    public String toString() {
+        StringWriter s = new StringWriter();
+        JsonWriter writer = new JsonWriter(s);
+        writer.setLenient(false);
+        write(writer);
+        return s.toString();
     }
 
 }

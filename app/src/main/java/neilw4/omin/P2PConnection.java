@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 
 import neilw4.omin.connection.ConnectionManager;
 import neilw4.omin.datastructure.BloomFilter;
@@ -24,6 +25,7 @@ import neilw4.omin.db.Message;
 import neilw4.omin.db.Messages;
 import neilw4.omin.db.UserId;
 
+import static junit.framework.Assert.assertEquals;
 import static neilw4.omin.Logger.*;
 
 public class P2PConnection implements ConnectionManager.ConnectionCallback {
@@ -54,6 +56,11 @@ public class P2PConnection implements ConnectionManager.ConnectionCallback {
         final OutputStreamWriter writer = new OutputStreamWriter(out);
         final JsonWriter jsonWriter = new JsonWriter(writer);
         final JsonReader jsonReader = new JsonReader(reader);
+        jsonWriter.setLenient(false);
+        jsonReader.setLenient(false);
+
+        jsonWriter.beginObject();
+        jsonWriter.name("interested");
 
         MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
             @Override
@@ -65,10 +72,22 @@ public class P2PConnection implements ConnectionManager.ConnectionCallback {
         });
         writer.flush();
 
+        jsonReader.beginObject();
+        assertEquals("interested", jsonReader.nextName());
         BloomFilter<UserId> partnerInterested = BloomFilter.read(jsonReader);
 
+        jsonWriter.name("messages");
+
         Messages.write(jsonWriter, Select.from(Message.class).list());
+        writer.flush();
+
+        assertEquals("messages", jsonReader.nextName());
         Messages.read(jsonReader);
+
+        jsonWriter.endObject();
+        writer.flush();
+        jsonReader.endObject();
+        debug(TAG, "finished transmission!");
     }
 
     public void onFailure(String msg) {

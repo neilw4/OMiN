@@ -10,10 +10,6 @@ import com.orm.SugarTransactionHelper;
 import com.orm.query.Select;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.List;
 
@@ -23,6 +19,7 @@ import static neilw4.omin.Logger.*;
 
 public final class Messages extends SugarRecord<Messages> {
 
+    public static final String TAG = Messages.class.getSimpleName();
     public static final int MAX_MESSAGES = 10;
 
     @SuppressWarnings("unused")
@@ -30,41 +27,33 @@ public final class Messages extends SugarRecord<Messages> {
         // Sugar ORM requires an empty constructor.
     }
     public static void read(final JsonReader reader) throws IOException {
-        try {
-            reader.setLenient(false);
-            reader.beginArray();
-            MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
-                @Override
-                public Void manipulateInTransaction() throws IOException {
-                    while(reader.hasNext()) {
-                        Message.read(reader);
-                    }
-                    return null;
+        reader.setLenient(false);
+        reader.beginArray();
+        MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
+            @Override
+            public Void manipulateInTransaction() throws IOException {
+                while(reader.hasNext()) {
+                    Message.read(reader);
                 }
-            });
-            reader.endArray();
-        } finally {
-            reader.close();
-        }
+                return null;
+            }
+        });
+        reader.endArray();
     }
 
     public static void write(final JsonWriter writer, final List<Message> messages) throws IOException {
-        try {
-            writer.setLenient(false);
-            writer.beginArray();
-            MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
-                @Override
-                public Void manipulateInTransaction() throws IOException {
-                    for (Message msg: messages) {
-                        msg.write(writer);
-                    }
-                    return null;
+        writer.setLenient(false);
+        writer.beginArray();
+        MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
+            @Override
+            public Void manipulateInTransaction() throws IOException {
+                for (Message msg: messages) {
+                    msg.write(writer);
                 }
-            });
-            writer.endArray();
-        } finally {
-            writer.close();
-        }
+                return null;
+            }
+        });
+        writer.endArray();
     }
 
     public static void evict() {
@@ -96,7 +85,13 @@ public final class Messages extends SugarRecord<Messages> {
         } else {
             StringReader stringReader = new StringReader(messages.filter);
             JsonReader jsonReader = new JsonReader(stringReader);
-            return BloomFilter.read(jsonReader);
+            try {
+                return BloomFilter.read(jsonReader);
+            } catch (IOException e) {
+                error(TAG, "error parsing " + messages.filter, e);
+                messages.delete();
+                return new BloomFilter<>(256, 2);
+            }
         }
     }
 

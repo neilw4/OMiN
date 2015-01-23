@@ -163,8 +163,9 @@ public class ConnectionManager {
             } else {
                 mCallback.onConnectedToClient(device, in, out);
             }
+            socket.close();
         } catch (IOException e) {
-            error(TAG, "IOException during connection: " + e.getMessage());
+            error(TAG, "IOException during connection", e);
         } finally {
             connectionLost();
         }

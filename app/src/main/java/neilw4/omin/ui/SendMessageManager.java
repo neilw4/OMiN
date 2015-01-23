@@ -13,6 +13,7 @@ import java.util.Date;
 
 import neilw4.omin.R;
 import neilw4.omin.db.Message;
+import neilw4.omin.db.MessageUid;
 import neilw4.omin.db.PrivateKey;
 
 import static neilw4.omin.Logger.*;
@@ -56,7 +57,9 @@ public class SendMessageManager {
             return;
         }
 
-        new Message("sig", body, new Timestamp(new Date().getTime())).save();
+        Message msg = new Message("sig", body, new Timestamp(new Date().getTime()));
+        msg.save();
+        new MessageUid(Select.from(PrivateKey.class).first().uid, msg).save();
 
         msg_text.getText().clear();
         info(TAG, "send message: " + body);
