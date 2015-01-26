@@ -2,12 +2,14 @@ package neilw4.omin.ui;
 
 import android.app.Activity;
 
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 import com.orm.query.Select;
 
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -57,11 +59,16 @@ public class SendMessageManager {
             return;
         }
 
-        Message msg = new Message("sig", body, new Timestamp(new Date().getTime()));
+        byte[] signatureBytes = new byte[16];
+        new SecureRandom().nextBytes(signatureBytes);
+        String signature = Base64.encodeToString(signatureBytes, 0);
+
+        Message msg = new Message(signature, body, new Timestamp(new Date().getTime()));
         msg.save();
-        new MessageUid(Select.from(PrivateKey.class).first().uid, msg).save();
+        MessageUid uid = new MessageUid(Select.from(PrivateKey.class).first().uid, msg);
+        uid.save();
 
         msg_text.getText().clear();
-        info(TAG, "send message: " + body);
+        info(TAG, "new message: " + msg.signature + " from " + uid.uid);
     }
 }

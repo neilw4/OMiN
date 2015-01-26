@@ -35,12 +35,12 @@ public class ConnectionServiceStarter extends BroadcastReceiver {
     private static final String BLUETOOTH_STATE_CHANGED_ACTION = BluetoothAdapter.ACTION_STATE_CHANGED;
 
     public static void start(Context context) {
-        info(TAG, "Starting bluetooth services");
+        debug(TAG, "Starting bluetooth services");
         ConnectionService.start(context);
     }
 
     public static void stop(Context context) {
-        info(TAG, "Stopping bluetooth services");
+        debug(TAG, "Stopping bluetooth services");
         ConnectionService.stop(context);
     }
 

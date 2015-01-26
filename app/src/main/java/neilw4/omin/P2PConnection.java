@@ -1,5 +1,6 @@
 package neilw4.omin;
 
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.os.Handler;
@@ -40,18 +41,19 @@ public class P2PConnection implements ConnectionManager.ConnectionCallback {
 
     @Override
     public void onConnectedToServer(BluetoothDevice device, InputStream in, OutputStream out) throws IOException {
-        info(TAG, "connected to server " + device.getName());
         onConnected(device, in, out);
     }
 
     @Override
     public void onConnectedToClient(BluetoothDevice device, InputStream in, OutputStream out) throws IOException {
-        info(TAG, "connected to client " + device.getName());
         onConnected(device, in, out);
 
     }
 
     private void onConnected(BluetoothDevice device, InputStream in, OutputStream out) throws IOException {
+        String myAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
+        String myName = BluetoothAdapter.getDefaultAdapter().getName();
+        info(TAG, myAddress + " (" + myName + ") connected to " + device.getAddress() + " (" + device.getName() + ")");
         final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         final OutputStreamWriter writer = new OutputStreamWriter(out);
         final JsonWriter jsonWriter = new JsonWriter(writer);
@@ -87,7 +89,7 @@ public class P2PConnection implements ConnectionManager.ConnectionCallback {
         jsonWriter.endObject();
         writer.flush();
         jsonReader.endObject();
-        debug(TAG, "finished transmission!");
+        info(TAG, myAddress + " (" + myName + ") disconnected from " + device.getAddress() + " (" + device.getName() + ")");
     }
 
     public void onFailure(String msg) {

@@ -75,6 +75,7 @@ public class UnameManager {
                     }
                     UserId uid = getUid(uname);
                     new PrivateKey(uid, null).save();
+                    info(TAG, "new uname: " + uname);
                     setButtonEnabled(unameText.getText().toString());
                 }
             }
@@ -87,12 +88,12 @@ public class UnameManager {
 
     private void deleteKey(PrivateKey key) {
         if (key != null) {
-            info(TAG, "deleting key " + key.uid.uname);
+            debug(TAG, "deleting key " + key.uid.uname);
             for (UserId toDelete = key.uid; toDelete != null; toDelete = toDelete.parent) {
-                info(TAG, "checking parent id " + toDelete.uname);
+                debug(TAG, "checking parent id " + toDelete.uname);
                 Select<UserId> children = Select.from(UserId.class).where(Condition.prop("parent").eq(toDelete.getId()));
                 if (children.count() == 0) {
-                    info(TAG, "deleting parent id " + toDelete.uname);
+                    debug(TAG, "deleting parent id " + toDelete.uname);
                     toDelete.delete();
                 }
             }
@@ -108,10 +109,10 @@ public class UnameManager {
 
         if (uid == null) {
             uid = new UserId(uname, null);
-            info(TAG, "Created new uid " + uname);
+            debug(TAG, "Created new uid " + uname);
             uid.save();
         } else {
-            info(TAG, "Found existing uid " + uname);
+            debug(TAG, "Found existing uid " + uname);
         }
         return uid;
     }

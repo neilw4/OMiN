@@ -10,12 +10,14 @@ import com.orm.query.Select;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import neilw4.omin.datastructure.BloomFilter;
 
 import static junit.framework.Assert.*;
+import static neilw4.omin.Logger.*;
 
 public class Message extends SugarRecord<Message> {
 
@@ -65,6 +67,7 @@ public class Message extends SugarRecord<Message> {
             msg.save();
             MessageUid.makeMsgUids(uids, msg);
         }
+        info(TAG, "received message " + signature + " from " + Arrays.toString(uids.toArray()));
         return msg;
     }
 
@@ -79,6 +82,7 @@ public class Message extends SugarRecord<Message> {
 
         // Record that the message is being sent.
         lastSent = new Timestamp(new Date().getTime());
+        info(TAG, "sent message " + signature + " from " + Arrays.toString(Select.from(MessageUid.class).where(Condition.prop("msg").eq(getId())).list().toArray()));
         save();
     }
 

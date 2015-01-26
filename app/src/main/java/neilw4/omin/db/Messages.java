@@ -65,7 +65,7 @@ public final class Messages extends SugarRecord<Messages> {
                     Select<Message> buffer = Select.from(Message.class).orderBy("last_sent");
                     while (buffer.count() > MAX_MESSAGES) {
                         Message evict = buffer.first();
-                        debug(Message.TAG, "Evicted message " + evict);
+                        info(Message.TAG, "Evicted message " + evict.signature);
                         evict.delete();
                     }
                     return null;

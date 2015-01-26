@@ -23,9 +23,6 @@ public final class Logger {
     }
 
     public static void verbose(String tag, String msg) {
-        if (logger != null) {
-            logger.verbose(tag + ": " + msg);
-        }
         android.util.Log.v(tag, msg);
     }
 
@@ -36,9 +33,6 @@ public final class Logger {
     }
 
     public static void debug(String tag, String msg) {
-        if (logger != null) {
-            logger.debug(tag + ": " + msg);
-        }
         android.util.Log.d(tag, msg);
     }
 
