@@ -66,8 +66,10 @@ public class Message extends SugarRecord<Message> {
             msg = new Message(signature, body, sent);
             msg.save();
             MessageUid.makeMsgUids(uids, msg);
+            info(TAG, "received message " + signature + " from " + Arrays.toString(uids.toArray()));
+        } else {
+            debug(TAG, "message " + signature + "already exists");
         }
-        info(TAG, "received message " + signature + " from " + Arrays.toString(uids.toArray()));
         return msg;
     }
 
@@ -82,7 +84,8 @@ public class Message extends SugarRecord<Message> {
 
         // Record that the message is being sent.
         lastSent = new Timestamp(new Date().getTime());
-        info(TAG, "sent message " + signature + " from " + Arrays.toString(Select.from(MessageUid.class).where(Condition.prop("msg").eq(getId())).list().toArray()));
+
+        debug(TAG, "sent message " + signature);
         save();
     }
 
