@@ -13,8 +13,11 @@ import android.os.Parcelable;
 import static neilw4.omin.Logger.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -207,6 +210,7 @@ public class ConnectionService extends IntentService {
         if (connection != null && connection.isListening()) {
             debug(TAG, "finished discovery");
             for (BluetoothDevice device: visibleDevices.values()) {
+                debug(TAG, "fetching uuid for " + device.getAddress() + " (" + device.getName() + ")");
                 device.fetchUuidsWithSdp();
             }
         }
@@ -258,32 +262,37 @@ public class ConnectionService extends IntentService {
         } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
             onStartDiscovery();
         } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-            Parcelable[] devices = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_DEVICE);
-            if (devices != null) {
-                for (Parcelable device : devices) {
-                    foundDevice((BluetoothDevice) device);
-                }
-            } else {
-                Parcelable device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                foundDevice((BluetoothDevice) device);
+            for (BluetoothDevice device : getExtras(intent, BluetoothDevice.EXTRA_DEVICE, BluetoothDevice.class)) {
+                foundDevice(device);
             }
         } else if (BluetoothDevice.ACTION_UUID.equals(action)) {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            Parcelable[] parcels = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);
-            if (parcels != null) {
-                for (Parcelable parcel : parcels) {
-                    foundUuid(device, ((ParcelUuid) parcel).getUuid());
-                }
-            } else {
-                Parcelable parcel = intent.getParcelableExtra(BluetoothDevice.EXTRA_UUID);
-                if (parcel != null) {
-                    foundUuid(device, ((ParcelUuid) parcel).getUuid());
-                }
+            for (ParcelUuid parcel : getExtras(intent, BluetoothDevice.EXTRA_UUID, ParcelUuid.class)) {
+                foundUuid(device, parcel.getUuid());
             }
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
             endDiscovery();
         } else {
             error(TAG, "Unknown action: " + action);
+        }
+    }
+
+    public static <T extends Parcelable> Iterable<T> getExtras(Intent i, String extra, Class<T> clazz) {
+        Parcelable[] ps = i.getParcelableArrayExtra(extra);
+        if (ps != null) {
+            List<T> ts = new ArrayList<T>(ps.length);
+            for (Parcelable p: ps) {
+                ts.add((T)p);
+            }
+            return ts;
+        } else {
+            Parcelable p = i.getParcelableExtra(extra);
+            if (p != null) {
+                return Collections.singleton((T)p);
+            } else {
+                warn(TAG, "No parcelable extra found for " + extra + " in intent " + i);
+                return Collections.EMPTY_LIST;
+            }
         }
     }
 }

@@ -31,7 +31,6 @@ public class ViewMessageManager {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                info("T--", "refreshing");
                 messageList.invalidateViews();
             }
         });
