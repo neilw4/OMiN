@@ -40,12 +40,25 @@
         android:layout_marginTop="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/activity_horizontal_margin"/>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_menu_rotate"
+            android:id="@+id/refresh_messages_button"
+            android:layout_alignParentLeft="true" />
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Send Message"
             android:id="@+id/send_message_button"
-            android:layout_gravity="right"/>
+            android:layout_alignParentRight="true" />
+
+    </RelativeLayout>
 
     <ListView
         android:layout_width="match_parent"
