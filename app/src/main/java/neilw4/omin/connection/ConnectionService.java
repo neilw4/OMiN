@@ -269,8 +269,16 @@ public class ConnectionService extends IntentService {
             }
         } else if (BluetoothDevice.ACTION_UUID.equals(action)) {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-            for (Parcelable parcel : intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID)) {
-                foundUuid(device, ((ParcelUuid) parcel).getUuid());
+            Parcelable[] parcels = intent.getParcelableArrayExtra(BluetoothDevice.EXTRA_UUID);
+            if (parcels != null) {
+                for (Parcelable parcel : parcels) {
+                    foundUuid(device, ((ParcelUuid) parcel).getUuid());
+                }
+            } else {
+                Parcelable parcel = intent.getParcelableExtra(BluetoothDevice.EXTRA_UUID);
+                if (parcel != null) {
+                    foundUuid(device, ((ParcelUuid) parcel).getUuid());
+                }
             }
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
             endDiscovery();
