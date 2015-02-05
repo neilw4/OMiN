@@ -217,23 +217,20 @@ public class ConnectionService extends IntentService {
     }
 
     protected void foundDevice(BluetoothDevice device) {
-        if (!visibleDevices.containsKey(device.getAddress())) {
+        if (device != null && !visibleDevices.containsKey(device.getAddress())) {
             debug(TAG, "found device " + device.getName() + " (" + device.getAddress() + ")");
             visibleDevices.put(device.getAddress(), device);
         }
     }
 
     protected void foundUuid(BluetoothDevice device, UUID uuid) {
-        if (uuid == null) {
-            error(TAG, "UUID for " + device.getName() + " (" + device.getAddress() + ") was null");
-            return;
-        }
+
         String address = device.getAddress();
         if (visibleDevices.containsKey(address)) {
             visibleDevices.remove(address);
         }
 
-        if (ConnectionManager.uuidMatches(uuid) && !ominDevices.containsKey(address)) {
+        if (uuid != null && ConnectionManager.uuidMatches(uuid) && !ominDevices.containsKey(address)) {
             info(TAG, "found OMiN device " + device.getAddress() + " (" + device.getName() + ")");
             ominDevices.put(address, device);
             if (!recentDevices.contains(address) && connection.isListening()) {
@@ -268,7 +265,11 @@ public class ConnectionService extends IntentService {
         } else if (BluetoothDevice.ACTION_UUID.equals(action)) {
             BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
             for (ParcelUuid parcel : getExtras(intent, BluetoothDevice.EXTRA_UUID, ParcelUuid.class)) {
-                foundUuid(device, parcel.getUuid());
+                UUID uuid = null;
+                if (parcel != null) {
+                    uuid = parcel.getUuid();
+                }
+                foundUuid(device, uuid);
             }
         } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
             endDiscovery();
@@ -291,7 +292,7 @@ public class ConnectionService extends IntentService {
                 return Collections.singleton((T)p);
             } else {
                 warn(TAG, "No parcelable extra found for " + extra + " in intent " + i);
-                return Collections.EMPTY_LIST;
+                return Collections.singleton(null);
             }
         }
     }
