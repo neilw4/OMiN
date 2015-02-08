@@ -74,7 +74,7 @@ public class UnameManager {
                         deleteKey(myKey);
                     }
                     UserId uid = getUid(uname);
-                    new PrivateKey(uid, null).save();
+                    new PrivateKey(uid).save();
                     info(TAG, "new uname: " + uname);
                     setButtonEnabled(unameText.getText().toString());
                 }

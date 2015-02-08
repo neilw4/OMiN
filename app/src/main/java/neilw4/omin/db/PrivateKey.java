@@ -4,11 +4,15 @@ import com.orm.SugarRecord;
 
 public class PrivateKey extends SugarRecord<PrivateKey> {
     public UserId uid;
-    public String key;
+    public byte[][] ps06Key = null;
 
-    public PrivateKey(UserId uid, String key) {
+    public PrivateKey(UserId uid) {
         this.uid = uid;
-        this.key = key;
+    }
+
+    public PrivateKey(UserId uid, byte[][] ps06Key) {
+        this.uid = uid;
+        this.ps06Key = ps06Key;
     }
 
     @SuppressWarnings("unused")
