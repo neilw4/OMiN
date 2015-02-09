@@ -1,114 +1,95 @@
 package neilw4.omin.crypto.sign;
 
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.CryptoException;
-import org.bouncycastle.crypto.digests.SHA256Digest;
+import android.os.AsyncTask;
+import android.util.Base64;
 
-import java.io.ByteArrayInputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
+import com.orm.query.Condition;
+import com.orm.query.Select;
 
-import javax.crypto.Cipher;
+import java.util.List;
 
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.engines.PS06Signer;
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.generators.PS06ParametersGenerator;
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.generators.PS06SecretKeyGenerator;
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.generators.PS06SetupGenerator;
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06MasterSecretKeyParameters;
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06Parameters;
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06PublicKeyParameters;
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SecretKeyGenerationParameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SecretKeyParameters;
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SetupGenerationParameters;
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SignParameters;
-import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06VerifyParameters;
-import it.unisa.dia.gas.jpbc.Element;
-import it.unisa.dia.gas.jpbc.Field;
-import it.unisa.dia.gas.jpbc.Pairing;
-import it.unisa.dia.gas.jpbc.PairingPreProcessing;
-import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveElement;
-import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveField;
-import it.unisa.dia.gas.plaf.jpbc.pairing.AbstractPairing;
-import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
-import it.unisa.dia.gas.plaf.jpbc.pairing.a.TypeAPairing;
-import it.unisa.dia.gas.plaf.jpbc.pairing.immutable.ImmutablePairingPreProcessing;
-import it.unisa.dia.gas.plaf.jpbc.pairing.parameters.PropertiesParameters;
-
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-import static neilw4.omin.Logger.error;
-
-import it.unisa.dia.gas.plaf.jpbc.pairing.immutable.ImmutableParing;
 import neilw4.omin.db.Message;
+import neilw4.omin.db.MessageUid;
+import neilw4.omin.db.PrivateKey;
+
+import static neilw4.omin.Logger.*;
 
 public class Signer {
+    private final static String TAG = Signer.class.getSimpleName();
 
-    public static void sign(Message msg) {
-        //TODO
+    private static volatile PS06 ps06 = new PS06();
+    private static volatile Params params = new StoredParams();
+
+    public static void asyncSign(Message msg) {
+        new AsyncSignTask(msg).execute();
     }
 
-    public static boolean verify(Message msg) {
-        //TODO
-        return true;
+    public static void asyncVerify(Message msg) {
+        new AsyncVerifyTask(msg).execute();
     }
 
-//    private static PropertiesParameters curveParams = curveParams();
-//    private static CurveElement curveElement = curveElement();
+    public static byte[][] generateKey(String id) {
+        return Serialiser.serialiseSecret((PS06SecretKeyParameters)ps06.extract(params.getKeyPair(), id));
+    }
 
-//    public static PS06Parameters master = new PS06Parameters(
-//        curveParams,
-//            curveElement,
-//        256,
-//        256
-//    );
+    private static class AsyncSignTask extends AsyncTask<Void, Void, Void> {
 
-//    public static byte[] privateKey(String id) {
-//        AsymmetricCipherKeyPair
-//    }
-//
-//    public static String sign(String... msg) {
-//
-//    }
-//
-//    public static boolean verify(String signature, String... msg) {
-//
-//    }
+        private final Message msg;
+        private final List<MessageUid> msgUids;
 
-//    public static AsymmetricCipherKeyPair genMasterKeys(int nU, int nM) throws UnsupportedEncodingException {
-//        PS06Parameters params = new PS06ParametersGenerator().init(
-//                curveParams(),
-//                nU, nM).generateParameters();
-//        PS06SetupGenerator setup = new PS06SetupGenerator();
-//                   setup.init(new PS06SetupGenerationParameters(null, params));
-//        AsymmetricCipherKeyPair masters = setup.generateKeyPair();
-//
-//        Pairing pairing = PairingFactory.getPairing(params.getCurveParams());
-//
-//        Element mskElement = ((PS06MasterSecretKeyParameters)masters.getPrivate()).getMsk();
-//        byte[] mskBytes = mskElement.toBytes();
-//        String mskString = Arrays.toString(mskBytes);
-//
-//        PS06Parameters params2 = new PS06ParametersGenerator().init(
-//                curveParams(),
-//                nU, nM).generateParameters();
-//        Pairing pairing2 = PairingFactory.getPairing(params.getCurveParams());
-//
-//        Element restoredMskElement = new CurveElement((CurveField)pairing2.getG1());
-//        restoredMskElement.setFromBytes(mskBytes);
-//
-//
-//        PS06PublicKeyParameters
-//
-//
-//        CipherParameters secretKey = extract(new AsymmetricCipherKeyPair(masters.getPublic(), new PS06MasterSecretKeyParameters(params, restoredMskElement)), "01001101");
-//        String message = "Hello World!!!";
-//        byte[] signature = sign(message, secretKey);
-//        assertTrue(verify(masters.getPublic(), message, "01001101", signature));
-//
-//
-//        return masters;
-//    }
+        public AsyncSignTask(Message msg) {
+            this.msg = msg;
+            msgUids = Select.from(MessageUid.class).where(Condition.prop("msg").eq(msg.getId())).list();
+        }
 
+        @Override
+        protected Void doInBackground(Void... ps) {
+            for (MessageUid msgUid: msgUids) {
+                if (msgUid.uid.parent == null) {
+                    byte[][] skBytes = Select.from(PrivateKey.class).where(Condition.prop("uid").eq(msgUid.uid.getId())).first().ps06Key;
+                    if (skBytes == null) {
+                        warn(TAG, "No secret key found for user " + msgUid.uid.uname);
+                        continue;
+                    }
+                    PS06SecretKeyParameters sk = Serialiser.deserialiseSecret(skBytes, msgUid.uid.uname, params.getMasterPublic(), params.getPairing());
+                    byte[] sig = ps06.sign(msg.body, sk);
+                    msgUid.signature = Base64.encodeToString(sig, Base64.DEFAULT);
+                    msgUid.save();
+                }
+            }
+            return null;
+        }
+    }
+
+    private static class AsyncVerifyTask extends AsyncTask<Void, Void, Boolean> {
+        private final Message msg;
+        private final List<MessageUid> msgUids;
+
+        public AsyncVerifyTask(Message msg) {
+            this.msg = msg;
+            msgUids = Select.from(MessageUid.class).where(Condition.prop("msg").eq(msg.getId())).list();
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... ps) {
+            for (MessageUid msgUid: msgUids) {
+                if (msgUid.uid.parent == null) {
+                    byte[] sig = Base64.decode(msgUid.signature, Base64.DEFAULT);
+                    if (!ps06.verify(params.getMasterPublic(), msg.body, msgUid.uid.uname, sig)) {
+                        warn(TAG, "Message verification failed for message " + msg.sent + " from " + msgUid.uid.uname + " with signature " + msgUid.signature);
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (!result) {
+                msg.delete();
+            }
+        }
+    }
 }

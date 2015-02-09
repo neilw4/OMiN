@@ -14,6 +14,7 @@ import com.orm.query.Select;
 
 import neilw4.omin.R;
 
+import neilw4.omin.crypto.sign.Signer;
 import neilw4.omin.db.PrivateKey;
 import neilw4.omin.db.UserId;
 
@@ -74,7 +75,8 @@ public class UnameManager {
                         deleteKey(myKey);
                     }
                     UserId uid = getUid(uname);
-                    new PrivateKey(uid).save();
+                    byte[][] ps06Key = Signer.generateKey(uname);
+                    new PrivateKey(uid, ps06Key).save();
                     info(TAG, "new uname: " + uname);
                     setButtonEnabled(unameText.getText().toString());
                 }

@@ -14,10 +14,10 @@ public abstract class Params {
     protected final static int NU = 256;
     protected final static int NM = 256;
 
-    private PropertiesParameters curveParams = null;
-    private PS06Parameters cipherParams = null;
-    private AsymmetricCipherKeyPair keyPair = null;
-    private Pairing pairing = null;
+    private volatile PropertiesParameters curveParams = null;
+    private volatile PS06Parameters cipherParams = null;
+    private volatile AsymmetricCipherKeyPair keyPair = null;
+    private volatile Pairing pairing = null;
 
     private final Object curveParamSync = new Object();
     private final Object cipherParamSync = new Object();

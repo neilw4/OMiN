@@ -7,6 +7,7 @@ import android.util.JsonWriter;
 import com.orm.MySugarTransactionHelper;
 import com.orm.SugarRecord;
 import com.orm.SugarTransactionHelper;
+import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import java.io.IOException;
@@ -48,7 +49,19 @@ public final class Messages extends SugarRecord<Messages> {
             @Override
             public Void manipulateInTransaction() throws IOException {
                 for (Message msg: messages) {
-                    msg.write(writer);
+                    List<MessageUid> uids = Select.from(MessageUid.class).where(Condition.prop("msg").eq(msg.getId())).list();
+                    boolean canSend = true;
+                    for (MessageUid uid: uids) {
+                        if (uid.signature == null) {
+                            warn(TAG, "can't send message " + msg.sent + "because no signature for " + uid.uid.uname);
+                            canSend = false;
+                            break;
+                        }
+                    }
+
+                    if (canSend) {
+                        msg.write(writer);
+                    }
                 }
                 return null;
             }

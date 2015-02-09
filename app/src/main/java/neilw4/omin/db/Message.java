@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import neilw4.omin.crypto.sign.Signer;
 import neilw4.omin.datastructure.BloomFilter;
 
 import static junit.framework.Assert.*;
@@ -88,6 +89,7 @@ public class Message extends SugarRecord<Message> {
                 uids.add(msgUid.uid);
             }
             User.consolidateUserIds(uids);
+            Signer.asyncVerify(msg);
             info(TAG, "received message " + sent + " from " + Arrays.toString(uids.toArray()));
         } else {
             debug(TAG, "message " + sent + "already exists");
