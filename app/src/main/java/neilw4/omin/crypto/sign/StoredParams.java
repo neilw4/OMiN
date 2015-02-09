@@ -2,7 +2,15 @@ package neilw4.omin.crypto.sign;
 
 import android.util.Base64;
 
-public class StoredParams {
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+
+import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06MasterSecretKeyParameters;
+import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06Parameters;
+import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06PublicKeyParameters;
+
+import static neilw4.omin.crypto.sign.Serialiser.*;
+
+public class StoredParams extends Params {
     private static final String CIPHER_PARAMS = "L92P1icDihwAOylSWSK3YDupyxQSC2rx8MQ48VRw9PoeRedTf6g8dP3SRcLTVBGYmVzG0BkEHzOL\n3jFdbocLn4FMII83BLAJ9zZDVat0RT3/F8jYYCHHn3YKCa1czpLjCpVhWC9switUarqixxZZn6Rr\n917YVfWfquXOi5qaHS0=\n";
 
     private static final String MASTER_SECRET = "WUsmxG+8Zh11SET4sN1NK/ovbTw6mR6sDaFBdXN/hMcT+YehNhbMsHPPQlVh1gSmZgSFoMPl4DqI\nBCSlZC3CuBlugM1agQJjNZAdbaBJmEGNNIwiSFztobPx0StIIBlkHI9u/xV3bOLu4XYDe7rixaUT\nR2odhpyWhO63rLomXQA=\n";
@@ -526,28 +534,32 @@ public class StoredParams {
         "YvmbDhJwC1QQwHTiBezEAKVdjJdyKGUU8PtOlhi0Xntfb+uJ6KfGRg1WTDxOW5vBqdkdoBmX8sK/\nYQ/hVmFK/1XXV/IHgM8SqYGHbRnsAgqYWBuw53kuhADz6osv2gQGSgIxuKG2Ggfi5Icp81tPi9UG\nwRyMMl/SD11YQNvnIg8=\n"
     };
 
-    private static byte[] decode(String s) {
+    private byte[] decode(String s) {
         return Base64.decode(s, Base64.DEFAULT);
     }
 
-    private static String encode(byte[] b) {
+    private String encode(byte[] b) {
         return Base64.encodeToString(b, Base64.DEFAULT);
     }
 
-    protected static byte[] cipherParams() {
-        return decode(CIPHER_PARAMS);
+    protected PS06Parameters generateCipherParams() {
+        return deserialiseCipherParams(decode(CIPHER_PARAMS), getCurveParams(), getPairing(), NU, NM);
     }
 
-    protected static byte[] masterSecret() {
-        return decode(MASTER_SECRET);
+    protected AsymmetricCipherKeyPair generateKeyPair() {
+        return new AsymmetricCipherKeyPair(generateMasterPublic(), generateMasterSecret());
     }
 
-    protected static byte[][] masterPublic() {
-        byte[][] masterPublic = new byte[MASTER_PUBLIC.length][];
-        for (int i = 0; i < masterPublic.length; i++) {
-            masterPublic[i] = decode(MASTER_PUBLIC[i]);
+    protected PS06MasterSecretKeyParameters generateMasterSecret() {
+        return deserialiseMasterSecret(decode(MASTER_SECRET), getCipherParams(), getPairing());
+    }
+
+    protected PS06PublicKeyParameters generateMasterPublic() {
+        byte[][] bytes = new byte[MASTER_PUBLIC.length][];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = decode(MASTER_PUBLIC[i]);
         }
-        return masterPublic;
+        return deserialiseMasterPublic(bytes, getCipherParams(), getPairing());
     }
 
 }

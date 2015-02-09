@@ -7,40 +7,42 @@ import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06Parameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06PublicKeyParameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SecretKeyParameters;
 import it.unisa.dia.gas.jpbc.Element;
+import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveElement;
 import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveField;
+import it.unisa.dia.gas.plaf.jpbc.pairing.parameters.PropertiesParameters;
 
 import static junit.framework.Assert.assertTrue;
 
 public class Serialiser {
 
-    private static byte[] serialiseElement(Element e) {
+    public static byte[] serialiseCurveElement(Element e) {
         return e.toBytes();
     }
 
     // Only works with G1 CurveElements.
-    private static Element deserialiseElement(byte[] bytes) {
-        Element e = new CurveElement((CurveField)PS06.getPairing().getG1());
+    public static Element deserialiseCurveElement(byte[] bytes, Pairing pairing) {
+        Element e = new CurveElement((CurveField)pairing.getG1());
         e.setFromBytes(bytes);
         return e.getImmutable();
     }
 
     public static byte[] serialiseCipherParams(PS06Parameters cipherParams) {
-        return serialiseElement(cipherParams.getG());
+        return serialiseCurveElement(cipherParams.getG());
     }
 
-    public static PS06Parameters deserialiseCipherParams(byte[] bytes) {
-        Element g = deserialiseElement(bytes);
-        return new PS06Parameters(PS06.getCurveParams(), g, PS06.NU, PS06.NM);
+    public static PS06Parameters deserialiseCipherParams(byte[] bytes, PropertiesParameters curveParams, Pairing pairing, int NU, int NM) {
+        Element g = deserialiseCurveElement(bytes, pairing);
+        return new PS06Parameters(curveParams, g, NU, NM);
     }
 
     public static byte[] serialiseMasterSecret(PS06MasterSecretKeyParameters msk) {
         return  msk.getMsk().toBytes();
     }
 
-    public static PS06MasterSecretKeyParameters deserialiseMasterSecret(byte[] bytes) {
-        Element msk = deserialiseElement(bytes);
-        return new PS06MasterSecretKeyParameters(PS06.getCipherParams(), msk);
+    public static PS06MasterSecretKeyParameters deserialiseMasterSecret(byte[] bytes, PS06Parameters cipherParams, Pairing pairing) {
+        Element msk = deserialiseCurveElement(bytes, pairing);
+        return new PS06MasterSecretKeyParameters(cipherParams, msk);
     }
 
     public static byte[][] serialiseMasterPublic(PS06PublicKeyParameters mpk) {
@@ -48,91 +50,93 @@ public class Serialiser {
         int nu = mpk.getParameters().getnU();
 
         byte[][] bytes = new byte[4 + nm + nu][];
-        bytes[0] = serialiseElement(mpk.getG1());
-        bytes[1] = serialiseElement(mpk.getG2());
-        bytes[2] = serialiseElement(mpk.getmPrime());
-        bytes[3] = serialiseElement(mpk.getuPrime());
+        bytes[0] = serialiseCurveElement(mpk.getG1());
+        bytes[1] = serialiseCurveElement(mpk.getG2());
+        bytes[2] = serialiseCurveElement(mpk.getmPrime());
+        bytes[3] = serialiseCurveElement(mpk.getuPrime());
 
         for (int i = 0; i < nm; i++) {
-            bytes[4 + i] = serialiseElement(mpk.getMAt(i));
+            bytes[4 + i] = serialiseCurveElement(mpk.getMAt(i));
         }
 
         for (int i = 0; i < nu; i++) {
-            bytes[4 + nm + i] = serialiseElement(mpk.getUAt(i));
+            bytes[4 + nm + i] = serialiseCurveElement(mpk.getUAt(i));
         }
         return bytes;
     }
 
-    public static PS06PublicKeyParameters deserialiseMasterPublic(byte[][] bytes) {
-        int nm = PS06.getCipherParams().getnM();
-        int nu = PS06.getCipherParams().getnU();
+    public static PS06PublicKeyParameters deserialiseMasterPublic(byte[][] bytes, PS06Parameters cipherParams, Pairing pairing) {
+        int nm = cipherParams.getnM();
+        int nu = cipherParams.getnU();
 
-        Element g1 = deserialiseElement(bytes[0]);
-        Element g2 = deserialiseElement(bytes[1]);
-        Element mPrime = deserialiseElement(bytes[2]);
-        Element uPrime = deserialiseElement(bytes[3]);
+        Element g1 = deserialiseCurveElement(bytes[0], pairing);
+        Element g2 = deserialiseCurveElement(bytes[1], pairing);
+        Element mPrime = deserialiseCurveElement(bytes[2], pairing);
+        Element uPrime = deserialiseCurveElement(bytes[3], pairing);
 
         Element[] ms = new Element[nm];
         for (int i = 0; i < nm; i++) {
-            ms[i] = deserialiseElement(bytes[4 + i]);
+            ms[i] = deserialiseCurveElement(bytes[4 + i], pairing);
         }
 
         Element[] us = new Element[nu];
         for (int i = 0; i < nu; i++) {
-            us[i] = deserialiseElement(bytes[4 + nm + i]);
+            us[i] = deserialiseCurveElement(bytes[4 + nm + i], pairing);
         }
 
-        return new PS06PublicKeyParameters(PS06.getCipherParams(), g1, g2, uPrime, mPrime, us, ms);
+        return new PS06PublicKeyParameters(cipherParams, g1, g2, uPrime, mPrime, us, ms);
     }
 
     public static byte[][] serialiseSecret(PS06SecretKeyParameters secret) {
         return new byte[][] {
-                serialiseElement(secret.getD1()),
-                serialiseElement(secret.getD2())
+                serialiseCurveElement(secret.getD1()),
+                serialiseCurveElement(secret.getD2())
         };
     }
 
-    public static PS06SecretKeyParameters deserialiseSecret(byte[][] bytes, String id) {
-        Element d1 = deserialiseElement(bytes[0]);
-        Element d2 = deserialiseElement(bytes[1]);
-        return new PS06SecretKeyParameters(PS06.getMasterPublic(), id, d1, d2);
+    public static PS06SecretKeyParameters deserialiseSecret(byte[][] bytes, String id, PS06PublicKeyParameters masterPublic, Pairing pairing) {
+        Element d1 = deserialiseCurveElement(bytes[0], pairing);
+        Element d2 = deserialiseCurveElement(bytes[1], pairing);
+        return new PS06SecretKeyParameters(masterPublic, id, d1, d2);
     }
 
-    public static void testSerialiseAll() {
-        PS06.regenerate();
 
-        byte[] paramBytes = serialiseCipherParams(PS06.getCipherParams());
-        byte[] mskBytes = serialiseMasterSecret(PS06.getMasterSecret());
-        byte[][] mpkBytes = serialiseMasterPublic(PS06.getMasterPublic());
+    public static void test() {
+        String id = "01001101";
+
+        Params gen = new GeneratedParams();
+        PS06 ps06 = new PS06();
+
+        byte[] paramBytes = serialiseCipherParams(gen.getCipherParams());
+        byte[] mskBytes = serialiseMasterSecret(gen.getMasterSecret());
+        byte[][] mpkBytes = serialiseMasterPublic(gen.getMasterPublic());
 
         String message = "Hello World!!!";
-        PS06SecretKeyParameters secretKey = PS06.extract("01001101");
-        byte[] signature = PS06.sign(message, secretKey);
+        PS06SecretKeyParameters secretKey = (PS06SecretKeyParameters)ps06.extract(gen.getKeyPair(), id);
+        byte[] signature = ps06.sign(message, secretKey);
 
         byte[][] secretKey1Bytes = serialiseSecret(secretKey);
 
-        PS06.regenerate();
+        PS06Parameters cipherParams = deserialiseCipherParams(paramBytes, gen.getCurveParams(), gen.getPairing(), Params.NU, Params.NM);
+        PS06MasterSecretKeyParameters msk = deserialiseMasterSecret(mskBytes, cipherParams, gen.getPairing());
+        PS06PublicKeyParameters mpk = deserialiseMasterPublic(mpkBytes, cipherParams, gen.getPairing());
+        AsymmetricCipherKeyPair keyPair = new AsymmetricCipherKeyPair(mpk, msk);
 
-        PS06.cipherParams = deserialiseCipherParams(paramBytes);
-        PS06MasterSecretKeyParameters msk = deserialiseMasterSecret(mskBytes);
-        PS06PublicKeyParameters mpk = deserialiseMasterPublic(mpkBytes);
-        PS06.keyPair = new AsymmetricCipherKeyPair(mpk, msk);
-
-        PS06SecretKeyParameters secretKey2 = PS06.extract("01001101");
-        byte[] signature2 = PS06.sign(message, secretKey2);
+        PS06SecretKeyParameters secretKey2 = (PS06SecretKeyParameters)ps06.extract(keyPair, id);
+        byte[] signature2 = ps06.sign(message, secretKey2);
 
         byte[][] secretKey2Bytes = serialiseSecret(secretKey2);
 
-        PS06SecretKeyParameters secretKey3 = deserialiseSecret(secretKey1Bytes, "01001101");
-        byte[] signature3 = PS06.sign(message, secretKey3);
+        PS06SecretKeyParameters secretKey3 = deserialiseSecret(secretKey1Bytes, id, mpk, gen.getPairing());
+        byte[] signature3 = ps06.sign(message, secretKey3);
 
-        PS06SecretKeyParameters secretKey4 = deserialiseSecret(secretKey2Bytes, "01001101");
-        byte[] signature4 = PS06.sign(message, secretKey4);
+        PS06SecretKeyParameters secretKey4 = deserialiseSecret(secretKey2Bytes, id, mpk, gen.getPairing());
+        byte[] signature4 = ps06.sign(message, secretKey4);
 
-        assertTrue(PS06.verify(message, "01001101", signature));
-        assertTrue(PS06.verify(message, "01001101", signature2));
-        assertTrue(PS06.verify(message, "01001101", signature3));
-        assertTrue(PS06.verify(message, "01001101", signature4));
+        assertTrue(ps06.verify(mpk, message, id, signature));
+        assertTrue(ps06.verify(mpk, message, id, signature2));
+        assertTrue(ps06.verify(gen.getMasterPublic(), message, id, signature3));
+        assertTrue(ps06.verify(gen.getMasterPublic(), message, id, signature4));
     }
 
 }
