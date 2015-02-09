@@ -29,8 +29,9 @@ public class Signer {
         new AsyncVerifyTask(msg).execute();
     }
 
-    public static byte[][] generateKey(String id) {
-        return Serialiser.serialiseSecret((PS06SecretKeyParameters)ps06.extract(params.getKeyPair(), id));
+    public static String generateKey(String id) {
+        byte[][] key = Serialiser.serialiseSecret((PS06SecretKeyParameters)ps06.extract(params.getKeyPair(), id));
+        return Base64.encodeToString(key[0], Base64.NO_WRAP) + "\n" + Base64.encodeToString(key[1], Base64.NO_WRAP);
     }
 
     private static class AsyncSignTask extends AsyncTask<Void, Void, Void> {
@@ -47,15 +48,23 @@ public class Signer {
         protected Void doInBackground(Void... ps) {
             for (MessageUid msgUid: msgUids) {
                 if (msgUid.uid.parent == null) {
-                    byte[][] skBytes = Select.from(PrivateKey.class).where(Condition.prop("uid").eq(msgUid.uid.getId())).first().ps06Key;
-                    if (skBytes == null) {
+                    long start = System.currentTimeMillis();
+                    String skString = Select.from(PrivateKey.class).where(Condition.prop("uid").eq(msgUid.uid.getId())).first().ps06Key;
+                    if (skString == null) {
                         warn(TAG, "No secret key found for user " + msgUid.uid.uname);
                         continue;
                     }
+                    String[] skSplit = skString.split("\n");
+                    byte[][] skBytes = new byte[][] {
+                            Base64.decode(skSplit[0], Base64.NO_WRAP),
+                            Base64.decode(skSplit[1], Base64.NO_WRAP)
+                    };
                     PS06SecretKeyParameters sk = Serialiser.deserialiseSecret(skBytes, msgUid.uid.uname, params.getMasterPublic(), params.getPairing());
                     byte[] sig = ps06.sign(msg.body, sk);
                     msgUid.signature = Base64.encodeToString(sig, Base64.DEFAULT);
                     msgUid.save();
+                    long time = System.currentTimeMillis() - start;
+                    info(TAG, "signed message " + msg.sent + " for " + msgUid.uid.uname + " in " + time + "ms");
                 }
             }
             return null;
@@ -75,11 +84,14 @@ public class Signer {
         protected Boolean doInBackground(Void... ps) {
             for (MessageUid msgUid: msgUids) {
                 if (msgUid.uid.parent == null) {
+                    long start = System.currentTimeMillis();
                     byte[] sig = Base64.decode(msgUid.signature, Base64.DEFAULT);
                     if (!ps06.verify(params.getMasterPublic(), msg.body, msgUid.uid.uname, sig)) {
                         warn(TAG, "Message verification failed for message " + msg.sent + " from " + msgUid.uid.uname + " with signature " + msgUid.signature);
                         return false;
                     }
+                    long time = System.currentTimeMillis() - start;
+                    info(TAG, "verified message " + msg.sent + " from " + msgUid.uid.uname + " in " + time + "ms");
                 }
             }
             return true;

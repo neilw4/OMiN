@@ -75,7 +75,7 @@ public class UnameManager {
                         deleteKey(myKey);
                     }
                     UserId uid = getUid(uname);
-                    byte[][] ps06Key = Signer.generateKey(uname);
+                    String ps06Key = Signer.generateKey(uname);
                     new PrivateKey(uid, ps06Key).save();
                     info(TAG, "new uname: " + uname);
                     setButtonEnabled(unameText.getText().toString());

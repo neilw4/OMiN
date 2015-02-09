@@ -2,7 +2,6 @@ package neilw4.omin.ui;
 
 import android.app.Activity;
 
-import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,7 +9,6 @@ import android.widget.EditText;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
-import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -56,7 +54,7 @@ public class SendMessageManager {
             return;
         }
 
-        List<PrivateKey> keys = Select.from(PrivateKey.class).where(Condition.prop("PS06_KEY")).list();
+        List<PrivateKey> keys = Select.from(PrivateKey.class).where(Condition.prop("PS06_KEY").like("%")).list();
         if (keys.isEmpty()) {
             warn(TAG, "Couldn't send message: no user id with secret key");
             return;
