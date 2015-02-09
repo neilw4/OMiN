@@ -10,6 +10,7 @@ import com.orm.query.Select;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -23,16 +24,14 @@ public class Message extends SugarRecord<Message> {
 
     public static final String TAG = Message.class.getSimpleName();
 
-    public String signature;
     public String body;
     public Timestamp sent;
     public Timestamp lastSent = null;
 
-    public Message(String signature, String body, Timestamp sent) {
-        this.signature = signature;
+    public Message(String body, Timestamp sent) {
         this.body = body;
         this.sent = sent;
-        this.lastSent = new Timestamp(new Date().getTime());
+        updateSent();
     }
 
     @SuppressWarnings("unused")
@@ -40,58 +39,79 @@ public class Message extends SugarRecord<Message> {
         // Sugar ORM requires an empty constructor.
     }
 
+    private void updateSent() {
+        // Record that the message is being sent.
+        this.lastSent = new Timestamp(new Date().getTime());
+    }
+
+    private static Message findInDb(String body, Timestamp sent, List<MessageUid> msgUids) {
+        for (MessageUid msgUid: msgUids) {
+            MessageUid matchMsgUid = Select.from(MessageUid.class)
+                    .where(
+                            Condition.prop("uid").eq(msgUid.uid),
+                            Condition.prop("signature").eq(msgUid.signature)
+                    ).first();
+            Message msg = matchMsgUid.msg;
+            if (msg.body.equals(body) && msg.sent.equals(sent)) {
+                return msg;
+            }
+        }
+        return null;
+    }
+
     public static Message read(JsonReader reader) throws IOException {
         reader.beginObject();
 
-        // Get the user ids and infer the user.
-        assertEquals("fromUser", reader.nextName());
-        List<UserId> uids = UserId.readUids(reader);
-        assertFalse(uids.isEmpty());
-
-        assertEquals("signature", reader.nextName());
-        String signature = reader.nextString();
         assertEquals("body", reader.nextName());
         String body = reader.nextString();
         assertEquals("sent", reader.nextName());
         Timestamp sent = new Timestamp(reader.nextLong());
 
+        // Get the user ids and infer the user.
+        assertEquals("user", reader.nextName());
+        List<MessageUid> msgUids = MessageUid.readUnsavedMessageUids(reader);
+        assertFalse(msgUids.isEmpty());
+
         reader.endObject();
 
         // Pull message from database if it exists.
-        Message msg = Select.from(Message.class).where(Condition.prop("signature").eq(signature))
-                .first();
+        Message msg = findInDb(body, sent, msgUids);
 
         if (msg == null) {
             // Message doesn't exist in database - create it.
-            msg = new Message(signature, body, sent);
+            msg = new Message(body, sent);
             msg.save();
-            MessageUid.makeMsgUids(uids, msg);
-            info(TAG, "received message " + signature + " from " + Arrays.toString(uids.toArray()));
+
+            List<UserId> uids = new ArrayList<>(msgUids.size());
+            for (MessageUid msgUid: msgUids) {
+                msgUid.save();
+                uids.add(msgUid.uid);
+            }
+            User.consolidateUserIds(uids);
+            info(TAG, "received message " + sent + " from " + Arrays.toString(uids.toArray()));
         } else {
-            debug(TAG, "message " + signature + "already exists");
+            debug(TAG, "message " + sent + "already exists");
         }
         return msg;
     }
 
     public void write(JsonWriter writer) throws IOException {
         writer.beginObject();
-        writer.name("fromUser");
-        MessageUid.writeMsgUids(writer, this);
-        writer.name("signature").value(signature);
         writer.name("body").value(body);
         writer.name("sent").value(sent.getTime());
+        writer.name("user");
+        List<MessageUid> msgUids = Select.from(MessageUid.class).where(Condition.prop("msg").eq(getId())).list();
+        MessageUid.writeMsgUids(writer, msgUids);
         writer.endObject();
 
-        // Record that the message is being sent.
-        lastSent = new Timestamp(new Date().getTime());
+        updateSent();
 
-        debug(TAG, "sent message " + signature);
+        debug(TAG, "sent message " + body);
         save();
     }
 
     @Override
     public void save() {
-        assertNotNull(signature);
         assertNotNull(body);
         assertNotNull(sent);
         super.save();
@@ -118,7 +138,7 @@ public class Message extends SugarRecord<Message> {
 
     @Override
     public int hashCode() {
-        return signature.hashCode() ^ body.hashCode() ^ (int)sent.getTime();
+        return body.hashCode() ^ (int)sent.getTime();
     }
 
 }

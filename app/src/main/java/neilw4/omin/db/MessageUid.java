@@ -1,5 +1,7 @@
 package neilw4.omin.db;
 
+import android.util.Base64;
+import android.util.JsonReader;
 import android.util.JsonWriter;
 
 import com.orm.SugarRecord;
@@ -7,6 +9,7 @@ import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.*;
@@ -14,11 +17,21 @@ import static junit.framework.Assert.*;
 public class MessageUid extends SugarRecord<MessageUid> {
 
     public UserId uid;
+    public String signature;
     public Message msg;
 
     public MessageUid(UserId uid, Message msg) {
+        this(uid, null, msg);
+    }
+
+    public MessageUid(UserId uid, String signature) {
+        this(uid, signature, null);
+    }
+
+    public MessageUid(UserId uid, String signature, Message msg) {
         this.uid = uid;
         this.msg = msg;
+        this.signature = signature;
     }
 
     @SuppressWarnings("unused")
@@ -26,29 +39,40 @@ public class MessageUid extends SugarRecord<MessageUid> {
         // Sugar ORM requires an empty constructor.
     }
 
-    protected static void makeMsgUids(List<UserId> uids, Message msg) {
-        for (UserId uid: uids) {
-            // Pull message-uid from database if it exists.
-            MessageUid msgUid = Select.from(MessageUid.class).where(
-                    Condition.prop("uid").eq(uid.getId()),
-                    Condition.prop("msg").eq(msg.getId())
-                ).first();
-
-            if (msgUid == null) {
-                // Doesn't exist in database - create it.
-                msgUid = new MessageUid(uid, msg);
-                msgUid.save();
-            }
+    protected static List<MessageUid> readUnsavedMessageUids(JsonReader reader) throws IOException {
+        List<MessageUid> msgUids = new ArrayList<>();
+        reader.beginArray();
+        while(reader.hasNext()) {
+            msgUids.add(readUnsaved(reader));
         }
+
+        reader.endArray();
+        return msgUids;
     }
 
-    protected static void writeMsgUids(JsonWriter writer, Message msg) throws IOException {
+    protected static MessageUid readUnsaved(JsonReader reader) throws IOException {
+        assertEquals("uid", reader.nextName());
+        UserId uid = UserId.read(reader);
+        assertEquals("signature", reader.nextName());
+        String signature = reader.nextString();
+        return new MessageUid(uid, signature);
+    }
+
+    protected static void writeMsgUids(JsonWriter writer, List<MessageUid> msgUids) throws IOException {
         writer.beginArray();
-        for (MessageUid msgUid:
-                Select.from(MessageUid.class).where(Condition.prop("msg").eq(msg.getId())).list()) {
-            msgUid.uid.write(writer);
+        for (MessageUid msgUid: msgUids) {
+            msgUid.write(writer);
         }
         writer.endArray();
+    }
+
+    protected void write(JsonWriter writer) throws IOException {
+        writer.beginObject();
+        writer.name("uid");
+        uid.write(writer);
+        writer.name("signature");
+        writer.value(signature);
+        writer.endObject();
     }
 
     @Override
