@@ -7,6 +7,7 @@ Progress report for period 2015-01-27 to 2015-02-10
 
 # Goals for next week
 - central PKG to distribute keys
+- tidy report
+- method for sending unsigned messages
 
 # Topics for discussion
-- paper?
