@@ -12,8 +12,6 @@ import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveElement;
 import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveField;
 import it.unisa.dia.gas.plaf.jpbc.pairing.parameters.PropertiesParameters;
 
-import static junit.framework.Assert.assertTrue;
-
 public class Serialiser {
 
     public static byte[] serialiseCurveElement(Element e) {
@@ -137,6 +135,12 @@ public class Serialiser {
         assertTrue(ps06.verify(mpk, message, id, signature2));
         assertTrue(ps06.verify(gen.getMasterPublic(), message, id, signature3));
         assertTrue(ps06.verify(gen.getMasterPublic(), message, id, signature4));
+    }
+
+    static void assertTrue(boolean test) {
+        if (!test) {
+            throw new AssertionError();
+        }
     }
 
 }

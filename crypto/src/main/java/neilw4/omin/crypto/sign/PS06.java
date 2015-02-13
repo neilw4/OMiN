@@ -20,10 +20,6 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.parameters.PropertiesParameters;
 
 import org.bouncycastle.crypto.CipherParameters;
 
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-import static junit.framework.Assert.fail;
-
 
 //http://gas.dia.unisa.it/projects/jpbc/schemes/ibs_ps06.html#.VNYWyzasXeQ
 /**
@@ -68,7 +64,7 @@ class PS06 {
         try {
             signature = signer.generateSignature();
         } catch (CryptoException e) {
-            fail(e.getMessage());
+            throw new AssertionError(e.getMessage());
         }
 
         return signature;
@@ -102,6 +98,20 @@ class PS06 {
 
         // verify with another identity
         assertFalse(ps06.verify(keyPair.getPublic(), message, "01001100", signature));
+    }
+
+
+    static void assertTrue(boolean test) {
+        if (!test) {
+            throw new AssertionError();
+        }
+    }
+
+
+    static void assertFalse(boolean test) {
+        if (test) {
+            throw new AssertionError();
+        }
     }
 }
 

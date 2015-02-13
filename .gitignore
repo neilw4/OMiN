@@ -5,6 +5,11 @@ local.properties
 .idea
 *.iml
 app/*.iml
+pkg/*.iml
+crypto/*.iml
+app/build
+pkg/build
+crypto/build
 .DS_Store
 build
 jpbc

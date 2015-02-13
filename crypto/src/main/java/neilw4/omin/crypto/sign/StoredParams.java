@@ -1,12 +1,11 @@
 package neilw4.omin.crypto.sign;
 
-import android.util.Base64;
-
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06MasterSecretKeyParameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06Parameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06PublicKeyParameters;
+import neilw4.omin.crypto.Base64;
 
 import static neilw4.omin.crypto.sign.Serialiser.*;
 
@@ -560,6 +559,12 @@ public class StoredParams extends Params {
             bytes[i] = decode(MASTER_PUBLIC[i]);
         }
         return deserialiseMasterPublic(bytes, getCipherParams(), getPairing());
+    }
+
+    static void assertTrue(boolean test) {
+        if (!test) {
+            throw new AssertionError();
+        }
     }
 
 }
