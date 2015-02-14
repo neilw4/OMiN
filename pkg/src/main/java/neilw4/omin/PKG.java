@@ -34,13 +34,13 @@ public class PKG {
 
             if (!form_data.containsKey("id")) {
                 // Request must contain the ID.
-                System.out.println("Status: 400 Bad Request");
+                System.out.println("Status: 400 Bad Request\n");
                 return;
             }
 
             String id = ((String)form_data.get("id")).trim();
             if (!id.matches("[a-z]+")) {
-                System.out.println("Status: 400 Bad Request");
+                System.out.println("Status: 400 Bad Request\n");
             }
 
             if (!USERS_FILE.exists()) {
@@ -57,7 +57,7 @@ public class PKG {
             while((ln = usersReader.readLine()) != null) {
                if (id.equals(ln.trim())) {
                    // ID already exists.
-                   System.out.println("Status: 401 Unauthorized");
+                   System.out.println("Status: 401 Unauthorized\n");
                    return;
                }
             }
