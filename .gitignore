@@ -17,3 +17,6 @@ sugar
 .hg
 .hgignore
 .git
+pkg/users.txt
+pkg/sk.txt
+pkg/errors.log

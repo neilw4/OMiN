@@ -4,3 +4,9 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':crypto')
 }
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'neilw4.omin.PKG'
+    }
+}

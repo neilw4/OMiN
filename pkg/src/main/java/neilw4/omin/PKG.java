@@ -62,11 +62,13 @@ public class PKG {
                }
             }
 
+            // Finished with CGI headers.
+            System.out.println();
+
             OutputStream usersOut = Channels.newOutputStream(usersChannel);
             BufferedWriter usersWriter = new BufferedWriter(new OutputStreamWriter(usersOut));
             usersWriter.write(id + "\n");
             usersWriter.flush();
-
 
 
         } catch (Exception e) {
