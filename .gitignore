@@ -20,3 +20,6 @@ sugar
 pkg/users.txt
 pkg/sk.txt
 pkg/errors.log
+pkg/msk.sign.param
+pkg/users.txt
+pkg/errors.log
