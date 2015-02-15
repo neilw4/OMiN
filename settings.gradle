@@ -1,1 +1,1 @@
-include ':app', ':pkg', ':crypto'
+include ':app', ':pkg', ':crypto', ':keyGen'
