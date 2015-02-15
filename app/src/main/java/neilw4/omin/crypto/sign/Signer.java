@@ -1,11 +1,16 @@
 package neilw4.omin.crypto.sign;
 
+import android.content.res.AssetManager;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Base64;
 
+import com.google.common.io.ByteStreams;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SecretKeyParameters;
@@ -19,7 +24,14 @@ public class Signer {
     private final static String TAG = Signer.class.getSimpleName();
 
     private static volatile PS06 ps06 = new PS06();
-    private static volatile Params params = new StoredParams();
+    private static volatile Params params = new Params(new Params.ParamsFileReader() {
+        @Override
+        public byte[] readFile(String fname) throws IOException {
+            AssetManager assets = Resources.getSystem().getAssets();
+            InputStream stream = assets.open(fname);
+            return ByteStreams.toByteArray(stream);
+        }
+    });
 
     public static void asyncSign(Message msg) {
         new AsyncSignTask(msg).execute();
@@ -27,11 +39,6 @@ public class Signer {
 
     public static void asyncVerify(Message msg) {
         new AsyncVerifyTask(msg).execute();
-    }
-
-    public static String generateKey(String id) {
-        byte[][] key = Serialiser.serialiseSecret((PS06SecretKeyParameters)ps06.extract(params.getKeyPair(), id));
-        return Base64.encodeToString(key[0], Base64.NO_WRAP) + "\n" + Base64.encodeToString(key[1], Base64.NO_WRAP);
     }
 
     private static class AsyncSignTask extends AsyncTask<Void, Void, Void> {
@@ -54,11 +61,7 @@ public class Signer {
                         warn(TAG, "No secret key found for user " + msgUid.uid.uname);
                         continue;
                     }
-                    String[] skSplit = skString.split("\n");
-                    byte[][] skBytes = new byte[][] {
-                            Base64.decode(skSplit[0], Base64.NO_WRAP),
-                            Base64.decode(skSplit[1], Base64.NO_WRAP)
-                    };
+                    byte[] skBytes = Base64.decode(skString, Base64.NO_WRAP);
                     PS06SecretKeyParameters sk = Serialiser.deserialiseSecret(skBytes, msgUid.uid.uname, params.getMasterPublic(), params.getPairing());
                     byte[] sig = ps06.sign(msg.body, sk);
                     msgUid.signature = Base64.encodeToString(sig, Base64.DEFAULT);

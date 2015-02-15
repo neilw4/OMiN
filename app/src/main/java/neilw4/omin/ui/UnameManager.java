@@ -12,9 +12,9 @@ import com.orm.SugarTransactionHelper;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
+import neilw4.omin.fetch_key.FetchKey;
 import neilw4.omin.R;
 
-import neilw4.omin.crypto.sign.Signer;
 import neilw4.omin.db.PrivateKey;
 import neilw4.omin.db.UserId;
 
@@ -75,10 +75,13 @@ public class UnameManager {
                         deleteKey(myKey);
                     }
                     UserId uid = getUid(uname);
-                    String ps06Key = Signer.generateKey(uname);
-                    new PrivateKey(uid, ps06Key).save();
+                    PrivateKey key = new PrivateKey(uid);
+                    key.save();
+
                     info(TAG, "new uname: " + uname);
                     setButtonEnabled(unameText.getText().toString());
+
+                    FetchKey.asyncFetch();
                 }
             }
         });
