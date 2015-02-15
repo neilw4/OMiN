@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import com.orm.query.Select;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 
@@ -50,7 +49,7 @@ public class FetchKey {
 
         @Override
         protected Void doInBackground(Void... params) {
-            HttpClient client = AndroidHttpClient.newInstance("OMiN");
+            AndroidHttpClient client = AndroidHttpClient.newInstance("OMiN");
             info(TAG, "Fetching secret keys from PKG");
             try {
                 for (PrivateKey pk: needsKey) {
@@ -62,6 +61,7 @@ public class FetchKey {
             } catch (IOException e) {
                 error(TAG, "Failed to communicate with PKG", e);
             }
+            client.close();
             return null;
         }
 
