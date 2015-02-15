@@ -51,6 +51,7 @@ public class PKG {
             String id = ((String)form_data.get("id")).trim();
             if (!id.matches("[a-z]+")) {
                 System.out.println("Status: 400 Bad Request\n");
+                return;
             }
 
             if (!USERS_FILE.exists()) {
