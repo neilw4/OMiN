@@ -21,6 +21,7 @@ import java.util.*;
 
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06MasterSecretKeyParameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SecretKeyParameters;
+import neilw4.omin.crypto.Base64;
 import neilw4.omin.crypto.sign.PS06;
 import neilw4.omin.crypto.sign.Params;
 import neilw4.omin.crypto.sign.Serialiser;
@@ -88,6 +89,10 @@ public class PKG {
 
             PS06MasterSecretKeyParameters msk = Serialiser.deserialiseMasterSecret(Files.readAllBytes(SK_FILE.toPath()), params.getCipherParams(), params.getPairing());
             PS06SecretKeyParameters sk = (PS06SecretKeyParameters)new PS06().extract(new AsymmetricCipherKeyPair(params.getMasterPublic(), msk), id);
+
+            byte[] skBytes = Serialiser.serialiseSecret(sk);
+            String skString = Base64.encodeToString(skBytes, Base64.NO_WRAP);
+            System.out.println(skString);
 
         } catch (Exception e) {
             e.printStackTrace();
