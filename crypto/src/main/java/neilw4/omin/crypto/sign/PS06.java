@@ -25,7 +25,7 @@ import org.bouncycastle.crypto.CipherParameters;
 /**
  * @author Angelo De Caro (jpbclib@gmail.com)
  */
-class PS06 {
+public class PS06 {
 
     public PS06() {
     }
@@ -84,7 +84,7 @@ class PS06 {
         PS06 ps06 = new PS06();
 
         // Setup -> (Public Key, Master Secret Key)
-        AsymmetricCipherKeyPair keyPair = ps06.setup(ps06.createParameters(256, 256, new StoredParams().getCurveParams()));
+        AsymmetricCipherKeyPair keyPair = ps06.setup(ps06.createParameters(256, 256, Params.getCurveParams()));
 
         // Extract -> Secret Key for Identity "01001101"
         CipherParameters secretKey = ps06.extract(keyPair, "01001101");

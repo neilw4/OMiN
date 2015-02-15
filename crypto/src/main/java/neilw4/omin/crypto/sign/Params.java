@@ -1,6 +1,6 @@
 package neilw4.omin.crypto.sign;
 
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+import java.io.IOException;
 
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06MasterSecretKeyParameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06Parameters;
@@ -9,22 +9,34 @@ import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 import it.unisa.dia.gas.plaf.jpbc.pairing.parameters.PropertiesParameters;
 
-public abstract class Params {
+public class Params {
 
-    protected final static int NU = 256;
-    protected final static int NM = 256;
+    public interface ParamsFileReader {
+        byte[] readFile(String fname) throws IOException;
+    }
 
-    private volatile PropertiesParameters curveParams = null;
+    public final static int NU = 256;
+    public final static int NM = 256;
+
+    private static volatile PropertiesParameters curveParams = null;
     private volatile PS06Parameters cipherParams = null;
-    private volatile AsymmetricCipherKeyPair keyPair = null;
+    private volatile PS06PublicKeyParameters masterPublic = null;
+    private volatile PS06MasterSecretKeyParameters masterSecret = null;
     private volatile Pairing pairing = null;
 
-    private final Object curveParamSync = new Object();
+    private static final Object curveParamSync = new Object();
     private final Object cipherParamSync = new Object();
-    private final Object keyPairSync = new Object();
+    private final Object masterPublicSync = new Object();
+    private final Object masterSecretSync = new Object();
     private final Object pairingSync = new Object();
 
-    public PropertiesParameters getCurveParams() {
+    private final ParamsFileReader reader;
+
+    public Params(ParamsFileReader reader) {
+        this.reader = reader;
+    }
+
+    public static PropertiesParameters getCurveParams() {
         if (curveParams == null) {
             synchronized (curveParamSync) {
                 if (curveParams == null) {
@@ -39,30 +51,33 @@ public abstract class Params {
         if (cipherParams == null) {
             synchronized(cipherParamSync) {
                 if (cipherParams == null) {
-                    cipherParams = generateCipherParams();
+                    cipherParams = readCipherParams();
                 }
             }
         }
         return cipherParams;
     }
 
-    public AsymmetricCipherKeyPair getKeyPair() {
-        if (keyPair == null) {
-            synchronized (keyPairSync) {
-                if (keyPair == null) {
-                    keyPair = generateKeyPair();
+    public PS06PublicKeyParameters getMasterPublic() {
+        if (masterPublic == null) {
+            synchronized (masterPublicSync) {
+                if (masterPublic == null) {
+                    masterPublic = readMasterPublic();
                 }
             }
         }
-        return keyPair;
+        return masterPublic;
     }
 
-    public PS06MasterSecretKeyParameters getMasterSecret() {
-        return (PS06MasterSecretKeyParameters)getKeyPair().getPrivate();
-    }
-
-    public PS06PublicKeyParameters getMasterPublic() {
-        return (PS06PublicKeyParameters)getKeyPair().getPublic();
+    public PS06PublicKeyParameters getMasterSecret() {
+        if (masterSecret == null) {
+            synchronized (masterSecretSync) {
+                if (masterSecret == null) {
+                    masterSecret = readMasterSecret();
+                }
+            }
+        }
+        return masterPublic;
     }
 
     public Pairing getPairing() {
@@ -76,7 +91,7 @@ public abstract class Params {
         return pairing;
     }
 
-    protected PropertiesParameters generateCurveParams() {
+    private static PropertiesParameters generateCurveParams() {
         PropertiesParameters curveParams = new PropertiesParameters();
         curveParams.put("type", "a");
         curveParams.put("q", "8780710799663312522437781984754049815806883199414208211028653399266475630880222957078625179422662221423155858769582317459277713367317481324925129998224791");
@@ -89,7 +104,34 @@ public abstract class Params {
         return curveParams;
     }
 
-    protected abstract PS06Parameters generateCipherParams();
-    protected abstract AsymmetricCipherKeyPair generateKeyPair();
+    private PS06Parameters readCipherParams() {
+        byte[] bytes;
+        try {
+            bytes = reader.readFile("cipher_params.sign.param");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Serialiser.deserialiseCipherParams(bytes, getCurveParams(), getPairing(), NU, NM);
+    }
+
+    private PS06PublicKeyParameters readMasterPublic() {
+        byte[] bytes;
+        try {
+            bytes = reader.readFile("mpk.sign.param");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Serialiser.deserialiseMasterPublic(bytes, getCipherParams(), getPairing());
+    }
+
+    private PS06MasterSecretKeyParameters readMasterSecret() {
+        byte[] bytes;
+        try {
+            bytes = reader.readFile("msk.sign.param");
+        } catch (IOException e) {
+            return null;
+        }
+        return Serialiser.deserialiseMasterSecret(bytes, getCipherParams(), getPairing());
+    }
 
 }

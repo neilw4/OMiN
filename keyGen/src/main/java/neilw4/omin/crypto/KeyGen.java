@@ -1,4 +1,4 @@
-package neilw4.omin.crypto.sign;
+package neilw4.omin.crypto;
 
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 
@@ -34,13 +34,8 @@ public class KeyGen {
         mskStream.write(Serialiser.serialiseMasterSecret((PS06MasterSecretKeyParameters)keyPair.getPrivate()));
         mskStream.close();
 
-        byte[][] xs = Serialiser.serialiseMasterPublic((PS06PublicKeyParameters)keyPair.getPublic());
-        for (byte[] x: xs) {
-            System.out.println(x.length);
-        }
-
-//        FileOutputStream mpkStream = new FileOutputStream(MPK_FILE, false);
-//        mpkStream.write(Serialiser.serialiseMasterPublic((PS06PublicKeyParameters)keyPair.getPublic()));
-//        mpkStream.close();
+        FileOutputStream mpkStream = new FileOutputStream(MPK_FILE, false);
+        mpkStream.write(Serialiser.serialiseMasterPublic((PS06PublicKeyParameters)keyPair.getPublic()));
+        mpkStream.close();
     }
 }

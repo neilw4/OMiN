@@ -8,6 +8,6 @@ jar {
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
     manifest {
-        attributes 'Main-Class': 'neilw4.omin.crypto.sign.KeyGen'
+        attributes 'Main-Class': 'neilw4.omin.crypto.KeyGen'
     }
 }

@@ -1,5 +1,7 @@
 package neilw4.omin;
 
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -14,11 +16,18 @@ import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
 import java.util.*;
+
+import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06MasterSecretKeyParameters;
+import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SecretKeyParameters;
+import neilw4.omin.crypto.sign.PS06;
+import neilw4.omin.crypto.sign.Params;
+import neilw4.omin.crypto.sign.Serialiser;
 
 public class PKG {
     public static final File USERS_FILE = new File("users.txt");
-    public static final File SK_FILE = new File("sk.txt");
+    public static final File SK_FILE = new File("msk.sign.param");
     public static final File ERROR_LOG = new File("errors.log");
 
     public static void main(String args[]) {
@@ -70,6 +79,15 @@ public class PKG {
             usersWriter.write(id + "\n");
             usersWriter.flush();
 
+            Params params = new Params(new Params.ParamsFileReader() {
+                @Override
+                public byte[] readFile(String fname) throws IOException {
+                    return Files.readAllBytes(new File(fname).toPath());
+                }
+            });
+
+            PS06MasterSecretKeyParameters msk = Serialiser.deserialiseMasterSecret(Files.readAllBytes(SK_FILE.toPath()), params.getCipherParams(), params.getPairing());
+            PS06SecretKeyParameters sk = (PS06SecretKeyParameters)new PS06().extract(new AsymmetricCipherKeyPair(params.getMasterPublic(), msk), id);
 
         } catch (Exception e) {
             e.printStackTrace();
