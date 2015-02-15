@@ -64,7 +64,7 @@ public class Signer {
                     msgUid.signature = Base64.encodeToString(sig, Base64.DEFAULT);
                     msgUid.save();
                     long time = System.currentTimeMillis() - start;
-                    info(TAG, "signed message " + msg.sent + " for " + msgUid.uid.uname + " in " + time + "ms");
+                    info(TAG, "signed message " + msg.sent + " for " + msgUid.uid.uname + " in " + time + "ms - " + sig.length + " bytes");
                 }
             }
             return null;
