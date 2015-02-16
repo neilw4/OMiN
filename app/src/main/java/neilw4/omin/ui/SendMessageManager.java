@@ -17,7 +17,7 @@ import neilw4.omin.R;
 import neilw4.omin.crypto.sign.Signer;
 import neilw4.omin.db.Message;
 import neilw4.omin.db.MessageUid;
-import neilw4.omin.db.PrivateKey;
+import neilw4.omin.db.SecretKey;
 
 import static neilw4.omin.Logger.*;
 
@@ -54,16 +54,16 @@ public class SendMessageManager {
             return;
         }
 
-        List<PrivateKey> keys = Select.from(PrivateKey.class).where(Condition.prop("PS06_KEY").like("%")).list();
+        List<SecretKey> keys = Select.from(SecretKey.class).list();
         if (keys.isEmpty()) {
-            warn(TAG, "Couldn't send message: no user id with secret key");
+            warn(TAG, "Couldn't send message: no user id");
             return;
         }
 
         Message msg = new Message(body, new Timestamp(new Date().getTime()));
         msg.save();
 
-        for (PrivateKey key: keys) {
+        for (SecretKey key: keys) {
             MessageUid uid = new MessageUid(key.uid, msg);
             uid.save();
         }

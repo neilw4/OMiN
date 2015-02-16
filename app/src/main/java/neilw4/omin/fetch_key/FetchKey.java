@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
-import neilw4.omin.db.PrivateKey;
+import neilw4.omin.db.SecretKey;
 
 import static neilw4.omin.Logger.*;
 
@@ -25,8 +25,8 @@ public class FetchKey {
     private static volatile AsyncFetchTask asyncFetchTask = null;
 
     public static void asyncFetch() {
-        List<PrivateKey> needsKey = new ArrayList<>();
-        for (PrivateKey pk: Select.from(PrivateKey.class).list()) {
+        List<SecretKey> needsKey = new ArrayList<>();
+        for (SecretKey pk: Select.from(SecretKey.class).list()) {
             if (pk.ps06Key == null) {
                 needsKey.add(pk);
             }
@@ -41,9 +41,9 @@ public class FetchKey {
     private static class AsyncFetchTask extends AsyncTask<Void, Void, Void> {
 
         private static final String TAG = AsyncFetchTask.class.getSimpleName();
-        private final List<PrivateKey> needsKey;
+        private final List<SecretKey> needsKey;
 
-        protected AsyncFetchTask(List<PrivateKey> needsKey) {
+        protected AsyncFetchTask(List<SecretKey> needsKey) {
             this.needsKey = needsKey;
         }
 
@@ -52,7 +52,7 @@ public class FetchKey {
             AndroidHttpClient client = AndroidHttpClient.newInstance("OMiN");
             info(TAG, "Fetching secret keys from PKG");
             try {
-                for (PrivateKey pk: needsKey) {
+                for (SecretKey pk: needsKey) {
                     HttpGet get = new HttpGet(PKG_URL + "?id=" + pk.uid.uname);
                     HttpResponse response = client.execute(get);
                     int statusCode = response.getStatusLine().getStatusCode();
@@ -77,7 +77,7 @@ public class FetchKey {
 
         @Override
         protected void onPostExecute(Void result) {
-            for (PrivateKey pk: needsKey) {
+            for (SecretKey pk: needsKey) {
                 if (pk.ps06Key != null) {
                     pk.save();
                 }

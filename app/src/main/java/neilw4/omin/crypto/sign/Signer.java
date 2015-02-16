@@ -16,7 +16,7 @@ import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SecretKeyParameter
 import neilw4.omin.R;
 import neilw4.omin.db.Message;
 import neilw4.omin.db.MessageUid;
-import neilw4.omin.db.PrivateKey;
+import neilw4.omin.db.SecretKey;
 
 import static neilw4.omin.Logger.*;
 
@@ -68,7 +68,7 @@ public class Signer {
         new AsyncVerifyTask(msg).execute();
     }
 
-    private static class AsyncSignTask extends AsyncTask<Void, Void, Void> {
+    private static class AsyncSignTask extends AsyncTask<Void, Void, Message.Security> {
 
         private final Message msg;
         private final List<MessageUid> msgUids;
@@ -79,29 +79,37 @@ public class Signer {
         }
 
         @Override
-        protected Void doInBackground(Void... ps) {
+        protected Message.Security doInBackground(Void... ps) {
+            Message.Security secure = Message.Security.INSECURE;
             for (MessageUid msgUid: msgUids) {
                 if (msgUid.uid.parent == null) {
                     long start = System.currentTimeMillis();
-                    String skString = Select.from(PrivateKey.class).where(Condition.prop("uid").eq(msgUid.uid.getId())).first().ps06Key;
-                    if (skString == null) {
+                    SecretKey sk = Select.from(SecretKey.class).where(Condition.prop("uid").eq(msgUid.uid.getId())).first();
+                    if (sk.ps06Key != null) {
+                        byte[] skBytes = Base64.decode(sk.ps06Key, Base64.NO_WRAP);
+                        PS06SecretKeyParameters skParams = Serialiser.deserialiseSecret(skBytes, msgUid.uid.uname, params.getMasterPublic(), params.getPairing());
+                        byte[] sig = ps06.sign(msg.body, skParams);
+                        msgUid.signature = Base64.encodeToString(sig, Base64.DEFAULT);
+                        msgUid.save();
+                        long time = System.currentTimeMillis() - start;
+                        secure = Message.Security.SECURE;
+                        info(TAG, "signed message " + msg.sent + " for " + msgUid.uid.uname + " in " + time + "ms - " + sig.length + " bytes");
+                    } else {
                         warn(TAG, "No secret key found for user " + msgUid.uid.uname);
-                        continue;
                     }
-                    byte[] skBytes = Base64.decode(skString, Base64.NO_WRAP);
-                    PS06SecretKeyParameters sk = Serialiser.deserialiseSecret(skBytes, msgUid.uid.uname, params.getMasterPublic(), params.getPairing());
-                    byte[] sig = ps06.sign(msg.body, sk);
-                    msgUid.signature = Base64.encodeToString(sig, Base64.DEFAULT);
-                    msgUid.save();
-                    long time = System.currentTimeMillis() - start;
-                    info(TAG, "signed message " + msg.sent + " for " + msgUid.uid.uname + " in " + time + "ms - " + sig.length + " bytes");
                 }
             }
-            return null;
+            return secure;
+        }
+
+        @Override
+        protected void onPostExecute(Message.Security security) {
+            msg.security = security;
+            msg.save();
         }
     }
 
-    private static class AsyncVerifyTask extends AsyncTask<Void, Void, Boolean> {
+    private static class AsyncVerifyTask extends AsyncTask<Void, Void, Message.Security> {
         private final Message msg;
         private final List<MessageUid> msgUids;
 
@@ -111,26 +119,31 @@ public class Signer {
         }
 
         @Override
-        protected Boolean doInBackground(Void... ps) {
+        protected Message.Security doInBackground(Void... ps) {
+            Message.Security security = Message.Security.INSECURE;
             for (MessageUid msgUid: msgUids) {
-                if (msgUid.uid.parent == null) {
+                if (msgUid.uid.parent == null && msgUid.signature != null) {
                     long start = System.currentTimeMillis();
                     byte[] sig = Base64.decode(msgUid.signature, Base64.DEFAULT);
                     if (!ps06.verify(params.getMasterPublic(), msg.body, msgUid.uid.uname, sig)) {
                         warn(TAG, "Message verification failed for message " + msg.sent + " from " + msgUid.uid.uname + " with signature " + msgUid.signature);
-                        return false;
+                        return Message.Security.UNVERIFIED;
                     }
                     long time = System.currentTimeMillis() - start;
                     info(TAG, "verified message " + msg.sent + " from " + msgUid.uid.uname + " in " + time + "ms");
+                    security = Message.Security.SECURE;
                 }
             }
-            return true;
+            return security;
         }
 
         @Override
-        protected void onPostExecute(Boolean result) {
-            if (!result) {
+        protected void onPostExecute(Message.Security security) {
+            if (security == Message.Security.UNVERIFIED) {
                 msg.delete();
+            } else {
+                msg.security = security;
+                msg.save();
             }
         }
     }

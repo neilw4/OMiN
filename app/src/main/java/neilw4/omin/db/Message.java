@@ -25,9 +25,13 @@ public class Message extends SugarRecord<Message> {
 
     public static final String TAG = Message.class.getSimpleName();
 
+    public static enum Security {UNVERIFIED, SECURE, INSECURE}
+
     public String body;
     public Timestamp sent;
     public Timestamp lastSent = null;
+    public Security security = Security.UNVERIFIED;
+
 
     public Message(String body, Timestamp sent) {
         this.body = body;

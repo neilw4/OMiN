@@ -12,10 +12,10 @@ import com.orm.SugarTransactionHelper;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
+import neilw4.omin.db.SecretKey;
 import neilw4.omin.fetch_key.FetchKey;
 import neilw4.omin.R;
 
-import neilw4.omin.db.PrivateKey;
 import neilw4.omin.db.UserId;
 
 import static junit.framework.Assert.assertNotNull;
@@ -57,7 +57,7 @@ public class UnameManager {
             }
         });
 
-        PrivateKey myKey = getKey();
+        SecretKey myKey = getKey();
         if (myKey != null) {
             unameText.setText(myKey.uid.uname);
         }
@@ -69,13 +69,13 @@ public class UnameManager {
         SugarTransactionHelper.doInTansaction(new SugarTransactionHelper.Callback() {
             @Override
             public void manipulateInTransaction() {
-                PrivateKey myKey = getKey();
+                SecretKey myKey = getKey();
                 if (myKey == null || !myKey.uid.uname.equals(uname)) {
                     if (myKey != null) {
                         deleteKey(myKey);
                     }
                     UserId uid = getUid(uname);
-                    PrivateKey key = new PrivateKey(uid);
+                    SecretKey key = new SecretKey(uid);
                     key.save();
 
                     info(TAG, "new uname: " + uname);
@@ -87,11 +87,11 @@ public class UnameManager {
         });
     }
 
-    private PrivateKey getKey() {
-        return Select.from(PrivateKey.class).first();
+    private SecretKey getKey() {
+        return Select.from(SecretKey.class).first();
     }
 
-    private void deleteKey(PrivateKey key) {
+    private void deleteKey(SecretKey key) {
         if (key != null) {
             debug(TAG, "deleting key " + key.uid.uname);
             for (UserId toDelete = key.uid; toDelete != null; toDelete = toDelete.parent) {
@@ -123,7 +123,7 @@ public class UnameManager {
     }
 
     private void setButtonEnabled(String newUname) {
-        PrivateKey myKey = getKey();
+        SecretKey myKey = getKey();
         if (myKey != null && newUname.equals(myKey.uid.uname)) {
             unameButton.setEnabled(false);
         } else if (!UserId.valid(newUname)) {
