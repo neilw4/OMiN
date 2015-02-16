@@ -55,8 +55,17 @@ public class FetchKey {
                 for (PrivateKey pk: needsKey) {
                     HttpGet get = new HttpGet(PKG_URL + "?id=" + pk.uid.uname);
                     HttpResponse response = client.execute(get);
-                    pk.ps06Key = EntityUtils.toString(response.getEntity());
-                    info(TAG, "successfully got secret key for " + pk.uid.uname);
+                    int statusCode = response.getStatusLine().getStatusCode();
+                    if (statusCode == 200) {
+                        pk.ps06Key = EntityUtils.toString(response.getEntity());
+                        info(TAG, "successfully got secret key for " + pk.uid.uname);
+                    } else if (statusCode == 401) {
+                        // id already taken.
+                        warn(TAG, "ID " + pk.uid.uname + " already taken");
+                        pk.delete();
+                    } else {
+                        error(TAG, "PKG returned " + response.getStatusLine());
+                    }
                 }
             } catch (IOException e) {
                 error(TAG, "Failed to communicate with PKG", e);
@@ -68,7 +77,9 @@ public class FetchKey {
         @Override
         protected void onPostExecute(Void result) {
             for (PrivateKey pk: needsKey) {
-                pk.save();
+                if (pk.ps06Key != null) {
+                    pk.save();
+                }
             }
             asyncFetchTask = null;
         }
