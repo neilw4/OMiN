@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.StringWriter;
 
 import neilw4.omin.connection.ConnectionManager;
 import neilw4.omin.datastructure.BloomFilter;

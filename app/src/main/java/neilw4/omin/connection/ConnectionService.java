@@ -231,7 +231,7 @@ public class ConnectionService extends IntentService {
         }
 
         if (uuid != null && ConnectionManager.uuidMatches(uuid) && !ominDevices.containsKey(address)) {
-            info(TAG, "found OMiN device " + device.getAddress() + " (" + device.getName() + ")");
+            debug(TAG, "found OMiN device " + device.getAddress() + " (" + device.getName() + ")");
             ominDevices.put(address, device);
             if (!recentDevices.contains(address) && connection.isListening()) {
                 debug(TAG, device.getName() + " not contacted recently. Connecting");
