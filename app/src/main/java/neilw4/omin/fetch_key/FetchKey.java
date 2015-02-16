@@ -68,7 +68,7 @@ public class FetchKey {
                     }
                 }
             } catch (IOException e) {
-                error(TAG, "Failed to communicate with PKG", e);
+                debug(TAG, "Failed to communicate with PKG", e);
             } finally {
                 client.close();
             }
