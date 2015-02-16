@@ -10,6 +10,8 @@ import android.content.Intent;
 import java.util.Arrays;
 import java.util.List;
 
+import neilw4.omin.crypto.sign.Signer;
+
 import static neilw4.omin.Logger.*;
 
 public class ConnectionServiceStarter extends BroadcastReceiver {
@@ -50,6 +52,8 @@ public class ConnectionServiceStarter extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        Signer.setResources(context.getResources());
+
         String action = intent.getAction();
         if (ENABLE_ACTIONS.contains(action)) {
             start(context);

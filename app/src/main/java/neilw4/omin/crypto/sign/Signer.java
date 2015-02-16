@@ -1,6 +1,5 @@
 package neilw4.omin.crypto.sign;
 
-import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.util.Base64;
@@ -14,6 +13,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SecretKeyParameters;
+import neilw4.omin.R;
 import neilw4.omin.db.Message;
 import neilw4.omin.db.MessageUid;
 import neilw4.omin.db.PrivateKey;
@@ -23,15 +23,42 @@ import static neilw4.omin.Logger.*;
 public class Signer {
     private final static String TAG = Signer.class.getSimpleName();
 
+    private static Resources resources;
+
     private static volatile PS06 ps06 = new PS06();
-    private static volatile Params params = new Params(new Params.ParamsFileReader() {
+    private static volatile Params params = new Params(new Params.ParamsReader() {
+        private byte[] read(int id) {
+            try {
+                InputStream stream = resources.openRawResource(id);
+                return ByteStreams.toByteArray(stream);
+            } catch (IOException e) {
+                error(TAG, "Couldn't read raw resource", e);
+                return null;
+            }
+        }
+
         @Override
-        public byte[] readFile(String fname) throws IOException {
-            AssetManager assets = Resources.getSystem().getAssets();
-            InputStream stream = assets.open(fname);
-            return ByteStreams.toByteArray(stream);
+        public byte[] readCipherParams() {
+            return read(R.raw.cipher_params);
+        }
+
+        @Override
+        public byte[] readMPK() {
+            return read(R.raw.mpk);
+        }
+
+        @Override
+        public byte[] readMSK() {
+            throw new UnsupportedOperationException("Client has no access to master secret");
         }
     });
+
+    // Slightly hacky but it's nearly impossible to pass the context around everywhere.
+    public static void setResources(Resources resources) {
+        if (Signer.resources == null) {
+            Signer.resources = resources;
+        }
+    }
 
     public static void asyncSign(Message msg) {
         new AsyncSignTask(msg).execute();

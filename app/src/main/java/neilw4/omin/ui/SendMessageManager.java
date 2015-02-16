@@ -68,6 +68,7 @@ public class SendMessageManager {
             uid.save();
         }
 
+        Signer.setResources(context.getResources());
         Signer.asyncSign(msg);
 
         msg_text.getText().clear();

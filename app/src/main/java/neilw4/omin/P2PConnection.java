@@ -47,7 +47,6 @@ public class P2PConnection implements ConnectionManager.ConnectionCallback {
     @Override
     public void onConnectedToClient(BluetoothDevice device, InputStream in, OutputStream out) throws IOException {
         onConnected(device, in, out);
-
     }
 
     private void onConnected(BluetoothDevice device, InputStream in, OutputStream out) throws IOException {

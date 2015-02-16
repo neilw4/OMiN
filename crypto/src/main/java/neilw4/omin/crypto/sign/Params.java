@@ -1,7 +1,5 @@
 package neilw4.omin.crypto.sign;
 
-import java.io.IOException;
-
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06MasterSecretKeyParameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06Parameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06PublicKeyParameters;
@@ -11,8 +9,10 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.parameters.PropertiesParameters;
 
 public class Params {
 
-    public interface ParamsFileReader {
-        byte[] readFile(String fname) throws IOException;
+    public interface ParamsReader {
+        byte[] readCipherParams();
+        byte[] readMPK();
+        byte[] readMSK();
     }
 
     public final static int NU = 256;
@@ -30,9 +30,9 @@ public class Params {
     private final Object masterSecretSync = new Object();
     private final Object pairingSync = new Object();
 
-    private final ParamsFileReader reader;
+    private final ParamsReader reader;
 
-    public Params(ParamsFileReader reader) {
+    public Params(ParamsReader reader) {
         this.reader = reader;
     }
 
@@ -105,32 +105,17 @@ public class Params {
     }
 
     private PS06Parameters readCipherParams() {
-        byte[] bytes;
-        try {
-            bytes = reader.readFile("cipher_params.sign.param");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        byte[] bytes = reader.readCipherParams();
         return Serialiser.deserialiseCipherParams(bytes, getCurveParams(), getPairing(), NU, NM);
     }
 
     private PS06PublicKeyParameters readMasterPublic() {
-        byte[] bytes;
-        try {
-            bytes = reader.readFile("mpk.sign.param");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        byte[] bytes = reader.readMPK();
         return Serialiser.deserialiseMasterPublic(bytes, getCipherParams(), getPairing());
     }
 
     private PS06MasterSecretKeyParameters readMasterSecret() {
-        byte[] bytes;
-        try {
-            bytes = reader.readFile("msk.sign.param");
-        } catch (IOException e) {
-            return null;
-        }
+        byte[] bytes = reader.readMSK();
         return Serialiser.deserialiseMasterSecret(bytes, getCipherParams(), getPairing());
     }
 

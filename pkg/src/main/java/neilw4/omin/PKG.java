@@ -81,10 +81,28 @@ public class PKG {
             usersWriter.write(id + "\n");
             usersWriter.flush();
 
-            Params params = new Params(new Params.ParamsFileReader() {
+            Params params = new Params(new Params.ParamsReader() {
                 @Override
-                public byte[] readFile(String fname) throws IOException {
-                    return Files.readAllBytes(new File(fname).toPath());
+                public byte[] readCipherParams() {
+                    return read("cipher_params.sign.params");
+                }
+
+                @Override
+                public byte[] readMPK() {
+                    return read("mpk.sign.params");
+                }
+
+                @Override
+                public byte[] readMSK() {
+                    return read("msk.sign.params");
+                }
+
+                private byte[] read(String fname) {
+                    try {
+                        return Files.readAllBytes(new File(fname).toPath());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             });
 
