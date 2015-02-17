@@ -114,6 +114,7 @@ public class PKG {
             System.out.println(skString);
 
         } catch (Exception e) {
+            System.out.println("Status: 500 Internal Server Error\n");
             e.printStackTrace();
         } finally {
             if (usersChannel != null) {
