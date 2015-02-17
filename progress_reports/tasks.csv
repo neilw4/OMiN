@@ -1,1 +1,39 @@
-Number,Done,Status,Description,Type,Importance,Timescale,Depends0,Depends140,Y,Done,create DOER,task,Primary,Days,,39,Y,Done,get android devices to test,task,Primary,Days,40,41,Y,Done,get ethics approval,task,Primary,Days,40,7,Y,Done,decide message/metadata format,task,Primary,Days,,6,Y,Done,design and implement a protocol for discovering nodes in close proximity and passing messages and necessary metadata between them.,objective,Primary,Weeks,7,8,Y,Done,design message passing protocol,task,Primary,Days,7,99,Y,Done,design message storage protocol,task,Primary,Days,7,15,Y,Done,Set up repository,task,Primary,Days,,16,Y,Done,Set up build,task,Primary,Days,15,10,Y,Done,implement message format,task,Primary,Days,7,1611,Y,Done,implement message storage,task,Primary,Days,9,1613,Y,Done,implement device discovery,task,Primary,Days,16,12,,Ready,implement message passing protocol,task,Primary,Days,8,1319,Y,Done,implement epidemic routing,task,Primary,Days,16,18,Y,Done,implement buffer eviction,task,Primary,Days,19,17,Y,Done,implement a simple epidemic routing algorithm to send message to all available nodes,objective,Primary,Days,18,1921,Y,Done,Design encryption mechanism,task,Primary,Days,,20,Y,Done,Design a routing algorithm using user metadata to route messages while disguising message content and metadata,objective,Primary,Days,21,44,,Ready,Poster,objective,Primary,Days,20,624,,Ready,Design smartphone UI,task,Secondary,Days,,23,,Blocked,Create a smartphone UI,objective,Secondary,Weeks,24,1428,Y,Done,design trust mechanism,task,Secondary,Days,,26,,Ready,Implement a more advanced routing algorithm,objective,Secondary,Weeks,20,27,,Blocked,Implement a mechanism to decide whether a node is trustworthy or not,objective,Secondary,Weeks,28,2631,,Ready,Find users to participate,task,Secondary,Days,,32,Y,Done,send logs to a central server,task,Secondary,Days,19,33,,Blocked,obtain performance data,task,Secondary,Weeks,31,3230,,Blocked,Evaluate the performance of the implemented routing algorithms,objective,Secondary,Weeks,33,36,,Ready,set up simulation,task,Tertiary,Weeks,,37,,Blocked,run simulation,task,Tertiary,Days,36,35,,Blocked,Compare the real world vs simulated performance of the routing algorithms,objective,Tertiary,Weeks,37,42,,Blocked,publish on app store,task,Tertiary,Days,23,43,Y,Done,publish on github,task,Tertiary,Days,16,,,,,,,,,Primary,89%,,,,,,,Secondary,22%,,,,,,,Tertiary,20%,,,,,,,Total,61%,,,,,,,
+Number,Done,Status,Description,Type,Importance,Timescale,Depends0,Depends1
+40,Y,Done,create DOER,task,Primary,Days,,
+39,Y,Done,get android devices to test,task,Primary,Days,40,
+41,Y,Done,get ethics approval,task,Primary,Days,40,
+7,Y,Done,decide message/metadata format,task,Primary,Days,,
+6,Y,Done,design and implement a protocol for discovering nodes in close proximity and passing messages and necessary metadata between them.,objective,Primary,Weeks,7,
+8,Y,Done,design message passing protocol,task,Primary,Days,7,9
+9,Y,Done,design message storage protocol,task,Primary,Days,7,
+15,Y,Done,Set up repository,task,Primary,Days,,
+16,Y,Done,Set up build,task,Primary,Days,15,
+10,Y,Done,implement message format,task,Primary,Days,7,16
+11,Y,Done,implement message storage,task,Primary,Days,9,16
+13,Y,Done,implement device discovery,task,Primary,Days,16,
+12,Y,Done,implement message passing protocol,task,Primary,Days,8,13
+19,Y,Done,implement epidemic routing,task,Primary,Days,16,
+18,Y,Done,implement buffer eviction,task,Primary,Days,19,
+17,Y,Done,implement a simple epidemic routing algorithm to send message to all available nodes,objective,Primary,Days,18,19
+21,Y,Done,Design encryption mechanism,task,Primary,Days,,
+20,Y,Done,Design a routing algorithm using user metadata to route messages while disguising message content and metadata,objective,Primary,Days,21,
+44,,Ready,Poster,objective,Primary,Days,20,6
+24,,Ready,Design smartphone UI,task,Secondary,Days,,
+23,,Blocked,Create a smartphone UI,objective,Secondary,Weeks,24,14
+28,Y,Done,design trust mechanism,task,Secondary,Days,,
+26,,Ready,Implement a more advanced routing algorithm,objective,Secondary,Weeks,20,
+27,,Blocked,Implement a mechanism to decide whether a node is trustworthy or not,objective,Secondary,Weeks,28,26
+31,,Ready,Find users to participate,task,Secondary,Days,,
+32,Y,Done,send logs to a central server,task,Secondary,Days,19,
+33,,Blocked,obtain performance data,task,Secondary,Weeks,31,32
+30,,Blocked,Evaluate the performance of the implemented routing algorithms,objective,Secondary,Weeks,33,
+36,,Ready,set up simulation,task,Tertiary,Weeks,,
+37,,Blocked,run simulation,task,Tertiary,Days,36,
+35,,Blocked,Compare the real world vs simulated performance of the routing algorithms,objective,Tertiary,Weeks,37,
+42,,Blocked,publish on app store,task,Tertiary,Days,23,
+43,Y,Done,publish on github,task,Tertiary,Days,16,
+,,,,,,,,
+Primary,95%,,,,,,,
+Secondary,22%,,,,,,,
+Tertiary,20%,,,,,,,
+Total,64%,,,,,,,
