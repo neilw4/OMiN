@@ -291,7 +291,7 @@ public class ConnectionService extends IntentService {
             if (p != null) {
                 return Collections.singleton((T)p);
             } else {
-                warn(TAG, "No parcelable extra found for " + extra + " in intent " + i);
+                debug(TAG, "No parcelable extra found for " + extra + " in intent " + i);
                 return Collections.singleton(null);
             }
         }
