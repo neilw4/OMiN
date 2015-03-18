@@ -7,8 +7,10 @@
 - Low: The user shall be able to send encrypted direct messages to a single user.
 - Low: The user shall be able to send multimedia messages to all others who follow the user or a hashtag in the message.
 
-# Functional Requirements
-None
+## Functional Requirements
+- High: The user shall be able to use the network on their smartphone.
+- Medium: The user shall be able to be confident in the origin and integrity of a message.
+- Medium: The user shall be able to use the network with minimal training.
 
 # System Requirements
 ## Non-Functional Requirements
