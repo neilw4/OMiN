@@ -26,7 +26,7 @@ public class Signer {
     private static Resources resources;
 
     private static volatile PS06 ps06 = new PS06();
-    private static volatile Params params = new Params(new Params.ParamsReader() {
+    private static volatile Params params = new ReadParams(new ReadParams.ParamsReader() {
         private byte[] read(int id) {
             try {
                 InputStream stream = resources.openRawResource(id);

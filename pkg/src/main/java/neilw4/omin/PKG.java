@@ -22,13 +22,17 @@ import java.util.*;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06MasterSecretKeyParameters;
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06SecretKeyParameters;
 import neilw4.omin.crypto.Base64;
+import neilw4.omin.crypto.sign.FileParams;
 import neilw4.omin.crypto.sign.PS06;
 import neilw4.omin.crypto.sign.Params;
+import neilw4.omin.crypto.sign.ReadParams;
 import neilw4.omin.crypto.sign.Serialiser;
 
 public class PKG {
     public static final File USERS_FILE = new File("users.txt");
-    public static final File SK_FILE = new File("msk.sign.param");
+    public static final File MSK_FILE = new File("msk.param");
+    public static final File MPK_FILE = new File("mpk.param");
+    public static final File PARAMS_FILE = new File("cipher_params.params");
     public static final File ERROR_LOG = new File("errors.log");
 
     public static void main(String args[]) {
@@ -81,32 +85,10 @@ public class PKG {
             usersWriter.write(id + "\n");
             usersWriter.flush();
 
-            Params params = new Params(new Params.ParamsReader() {
-                @Override
-                public byte[] readCipherParams() {
-                    return read("cipher_params.sign.params");
-                }
+            Params params = new ReadParams(new FileParams.Reader(PARAMS_FILE, MPK_FILE, MSK_FILE));
 
-                @Override
-                public byte[] readMPK() {
-                    return read("mpk.sign.params");
-                }
 
-                @Override
-                public byte[] readMSK() {
-                    return read("msk.sign.params");
-                }
-
-                private byte[] read(String fname) {
-                    try {
-                        return Files.readAllBytes(new File(fname).toPath());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
-
-            PS06MasterSecretKeyParameters msk = Serialiser.deserialiseMasterSecret(Files.readAllBytes(SK_FILE.toPath()), params.getCipherParams(), params.getPairing());
+            PS06MasterSecretKeyParameters msk = Serialiser.deserialiseMasterSecret(Files.readAllBytes(MSK_FILE.toPath()), params.getCipherParams(), params.getPairing());
             PS06SecretKeyParameters sk = (PS06SecretKeyParameters)new PS06().extract(new AsymmetricCipherKeyPair(params.getMasterPublic(), msk), id);
 
             byte[] skBytes = Serialiser.serialiseSecret(sk);

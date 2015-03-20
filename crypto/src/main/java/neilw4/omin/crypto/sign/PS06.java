@@ -21,7 +21,7 @@ import it.unisa.dia.gas.plaf.jpbc.pairing.parameters.PropertiesParameters;
 import org.bouncycastle.crypto.CipherParameters;
 
 
-//http://gas.dia.unisa.it/projects/jpbc/schemes/ibs_ps06.html#.VNYWyzasXeQ
+// http://gas.dia.unisa.it/projects/jpbc/schemes/ibs_ps06.html#.VNYWyzasXeQ
 /**
  * @author Angelo De Caro (jpbclib@gmail.com)
  */
@@ -79,27 +79,6 @@ public class PS06 {
 
         return signer.verifySignature(signature);
     }
-
-    public static void test() {
-        PS06 ps06 = new PS06();
-
-        // Setup -> (Public Key, Master Secret Key)
-        AsymmetricCipherKeyPair keyPair = ps06.setup(ps06.createParameters(256, 256, Params.getCurveParams()));
-
-        // Extract -> Secret Key for Identity "01001101"
-        CipherParameters secretKey = ps06.extract(keyPair, "01001101");
-
-        // Sign
-        String message = "Hello World!!!";
-        byte[] signature = ps06.sign(message, secretKey);
-
-        // verify with the same identity
-        assertTrue(ps06.verify(keyPair.getPublic(), message, "01001101", signature));
-
-        // verify with another identity
-        assertFalse(ps06.verify(keyPair.getPublic(), message, "01001100", signature));
-    }
-
 
     static void assertTrue(boolean test) {
         if (!test) {

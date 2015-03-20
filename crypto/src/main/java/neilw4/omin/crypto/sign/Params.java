@@ -7,40 +7,30 @@ import it.unisa.dia.gas.jpbc.Pairing;
 import it.unisa.dia.gas.plaf.jpbc.pairing.PairingFactory;
 import it.unisa.dia.gas.plaf.jpbc.pairing.parameters.PropertiesParameters;
 
-public class Params {
-
-    public interface ParamsReader {
-        byte[] readCipherParams();
-        byte[] readMPK();
-        byte[] readMSK();
-    }
+public abstract class Params {
 
     public final static int NU = 256;
     public final static int NM = 256;
 
-    private static volatile PropertiesParameters curveParams = null;
-    private volatile PS06Parameters cipherParams = null;
-    private volatile PS06PublicKeyParameters masterPublic = null;
-    private volatile PS06MasterSecretKeyParameters masterSecret = null;
+    private volatile PropertiesParameters curveParams = null;
+    protected volatile PS06Parameters cipherParams = null;
+    protected volatile PS06PublicKeyParameters masterPublic = null;
+    protected volatile PS06MasterSecretKeyParameters masterSecret = null;
     private volatile Pairing pairing = null;
 
-    private static final Object curveParamSync = new Object();
+    private final Object curveParamSync = new Object();
     private final Object cipherParamSync = new Object();
     private final Object masterPublicSync = new Object();
     private final Object masterSecretSync = new Object();
     private final Object pairingSync = new Object();
 
-    private final ParamsReader reader;
 
-    public Params(ParamsReader reader) {
-        this.reader = reader;
-    }
-
-    public static PropertiesParameters getCurveParams() {
+    public PropertiesParameters getCurveParams() {
         if (curveParams == null) {
             synchronized (curveParamSync) {
                 if (curveParams == null) {
-                    curveParams = generateCurveParams();
+                    generateCurveParams();
+                    assert curveParams != null;
                 }
             }
         }
@@ -51,7 +41,8 @@ public class Params {
         if (cipherParams == null) {
             synchronized(cipherParamSync) {
                 if (cipherParams == null) {
-                    cipherParams = readCipherParams();
+                    generateCipherParams();
+                    assert cipherParams != null;
                 }
             }
         }
@@ -62,37 +53,40 @@ public class Params {
         if (masterPublic == null) {
             synchronized (masterPublicSync) {
                 if (masterPublic == null) {
-                    masterPublic = readMasterPublic();
+                    generateMasterPublic();
+                    assert masterPublic != null;
                 }
             }
         }
         return masterPublic;
     }
 
-    public PS06PublicKeyParameters getMasterSecret() {
+    public PS06MasterSecretKeyParameters getMasterSecret() {
         if (masterSecret == null) {
             synchronized (masterSecretSync) {
                 if (masterSecret == null) {
-                    masterSecret = readMasterSecret();
+                    generateMasterSecret();
+                    assert masterSecret != null;
                 }
             }
         }
-        return masterPublic;
+        return masterSecret;
     }
 
     public Pairing getPairing() {
         if (pairing == null) {
             synchronized (pairingSync) {
                 if (pairing == null) {
-                    pairing = PairingFactory.getPairing(getCurveParams());
+                    generatePairing();
+                    assert pairing != null;
                 }
             }
         }
         return pairing;
     }
 
-    private static PropertiesParameters generateCurveParams() {
-        PropertiesParameters curveParams = new PropertiesParameters();
+    protected void generateCurveParams() {
+        curveParams = new PropertiesParameters();
         curveParams.put("type", "a");
         curveParams.put("q", "8780710799663312522437781984754049815806883199414208211028653399266475630880222957078625179422662221423155858769582317459277713367317481324925129998224791");
         curveParams.put("h", "12016012264891146079388821366740534204802954401251311822919615131047207289359704531102844802183906537786776");
@@ -101,22 +95,16 @@ public class Params {
         curveParams.put("exp1", "107");
         curveParams.put("sign1", "1");
         curveParams.put("sign0", "1");
-        return curveParams;
     }
 
-    private PS06Parameters readCipherParams() {
-        byte[] bytes = reader.readCipherParams();
-        return Serialiser.deserialiseCipherParams(bytes, getCurveParams(), getPairing(), NU, NM);
+    protected void generatePairing() {
+        pairing = PairingFactory.getPairing(getCurveParams());
     }
 
-    private PS06PublicKeyParameters readMasterPublic() {
-        byte[] bytes = reader.readMPK();
-        return Serialiser.deserialiseMasterPublic(bytes, getCipherParams(), getPairing());
-    }
+    protected abstract void generateCipherParams();
 
-    private PS06MasterSecretKeyParameters readMasterSecret() {
-        byte[] bytes = reader.readMSK();
-        return Serialiser.deserialiseMasterSecret(bytes, getCipherParams(), getPairing());
-    }
+    protected abstract void generateMasterPublic();
+
+    protected abstract void generateMasterSecret();
 
 }
