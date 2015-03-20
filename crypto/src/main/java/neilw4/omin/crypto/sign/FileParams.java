@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 
 public class FileParams {
 
@@ -37,7 +38,7 @@ public class FileParams {
             try {
                 try {
                     return Files.readAllBytes(f.toPath());
-                } catch (FileNotFoundException e) {
+                } catch (FileNotFoundException | NoSuchFileException e) {
                     new Writer(new GeneratedParams()).save(paramsFile, mpkFile, mskFile);
                     return Files.readAllBytes(f.toPath());
                 }
