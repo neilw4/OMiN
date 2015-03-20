@@ -29,8 +29,8 @@ import neilw4.omin.crypto.sign.Serialiser;
 
 public class PKG {
     public static final File USERS_FILE = new File("users.txt");
-    public static final File MSK_FILE = new File("msk.param");
-    public static final File MPK_FILE = new File("mpk.param");
+    public static final File MSK_FILE = new File("msk.params");
+    public static final File MPK_FILE = new File("mpk.params");
     public static final File PARAMS_FILE = new File("cipher_params.params");
     public static final File ERROR_LOG = new File("errors.log");
 
