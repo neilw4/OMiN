@@ -16,7 +16,6 @@ import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
-import java.nio.file.Files;
 import java.util.*;
 
 import it.unisa.dia.gas.crypto.jpbc.signature.ps06.params.PS06MasterSecretKeyParameters;
@@ -87,9 +86,13 @@ public class PKG {
 
             Params params = new ReadParams(new FileParams.Reader(PARAMS_FILE, MPK_FILE, MSK_FILE));
 
-
-            PS06MasterSecretKeyParameters msk = Serialiser.deserialiseMasterSecret(Files.readAllBytes(MSK_FILE.toPath()), params.getCipherParams(), params.getPairing());
-            PS06SecretKeyParameters sk = (PS06SecretKeyParameters)new PS06().extract(new AsymmetricCipherKeyPair(params.getMasterPublic(), msk), id);
+            PS06MasterSecretKeyParameters msk = params.getMasterSecret();
+            PS06SecretKeyParameters sk = (PS06SecretKeyParameters)
+                    new PS06().extract(
+                            new AsymmetricCipherKeyPair(
+                                    params.getMasterPublic(),
+                                    params.getMasterSecret()),
+                            id);
 
             byte[] skBytes = Serialiser.serialiseSecret(sk);
             String skString = Base64.encodeToString(skBytes, Base64.NO_WRAP);
