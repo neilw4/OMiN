@@ -94,14 +94,4 @@ public class P2PConnection implements ConnectionManager.ConnectionCallback {
         error(TAG, "failure: " + msg);
     }
 
-    private void toast(final String msg) {
-        if (context != null) {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-                }
-            });
-        }
-    }
 }

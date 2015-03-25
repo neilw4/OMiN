@@ -56,6 +56,9 @@ public class Message extends SugarRecord<Message> {
                             Condition.prop("uid").eq(msgUid.uid),
                             Condition.prop("signature").eq(msgUid.signature)
                     ).first();
+            if (matchMsgUid == null) {
+                return null;
+            }
             Message msg = matchMsgUid.msg;
             if (msg.body.equals(body) && msg.sent.equals(sent)) {
                 return msg;
@@ -89,6 +92,7 @@ public class Message extends SugarRecord<Message> {
 
             List<UserId> uids = new ArrayList<>(msgUids.size());
             for (MessageUid msgUid: msgUids) {
+                msgUid.msg = msg;
                 msgUid.save();
                 uids.add(msgUid.uid);
             }

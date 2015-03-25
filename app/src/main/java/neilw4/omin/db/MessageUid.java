@@ -1,12 +1,9 @@
 package neilw4.omin.db;
 
-import android.util.Base64;
 import android.util.JsonReader;
 import android.util.JsonWriter;
 
 import com.orm.SugarRecord;
-import com.orm.query.Condition;
-import com.orm.query.Select;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -51,10 +48,12 @@ public class MessageUid extends SugarRecord<MessageUid> {
     }
 
     protected static MessageUid readUnsaved(JsonReader reader) throws IOException {
+        reader.beginObject();
         assertEquals("uid", reader.nextName());
         UserId uid = UserId.read(reader);
         assertEquals("signature", reader.nextName());
         String signature = reader.nextString();
+        reader.endObject();
         return new MessageUid(uid, signature);
     }
 
