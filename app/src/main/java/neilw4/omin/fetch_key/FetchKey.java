@@ -20,7 +20,7 @@ import static neilw4.omin.Logger.*;
 
 public class FetchKey {
 
-    private static final String PKG_URL = "http://ndw.host.cs.st-andrews.ac.uk/omin.cgi";
+    private static final String PKG_URL = "https://ndw.host.cs.st-andrews.ac.uk/omin.cgi";
 
     private static volatile AsyncFetchTask asyncFetchTask = null;
 
