@@ -10,7 +10,9 @@ The project is split into three different modules, each build using Gradle:
 
 # Building
 Executing the following command from the project directory will build everything, downloading libraries, build scripts and the Android SDK if necessary:
+``` bash
 ./gradlew build
+```
 The binaries will now be in the following locations:
 - The main app will be located at app/build/outputs/apk/app-debug.apk
 - The cryptography library will be at crypto/build/libs/crypto.jar
@@ -22,4 +24,6 @@ To run the authentication server, configure a web server to run the omin.cgi scr
 
 ## Android App
 The app can be installed by executing the following command:
+``` bash
 ./gradlew installDebug
+```
