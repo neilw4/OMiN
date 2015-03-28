@@ -60,20 +60,36 @@ public class Signer {
         }
     }
 
+    public static void asyncSign(Message msg, Callback callback) {
+        new AsyncSignTask(msg, callback).execute();
+    }
+
     public static void asyncSign(Message msg) {
-        new AsyncSignTask(msg).execute();
+        asyncSign(msg, null);
+    }
+
+    public static void asyncVerify(Message msg, Callback callback) {
+        new AsyncVerifyTask(msg, callback).execute();
     }
 
     public static void asyncVerify(Message msg) {
-        new AsyncVerifyTask(msg).execute();
+        asyncVerify(msg, null);
     }
+
+    public static interface Callback {
+        void onSuccess();
+        void onFail();
+    }
+
 
     private static class AsyncSignTask extends AsyncTask<Void, Void, Message.Security> {
 
         private final Message msg;
         private final List<MessageUid> msgUids;
+        private final Callback callback;
 
-        public AsyncSignTask(Message msg) {
+        public AsyncSignTask(Message msg, Callback callback) {
+            this.callback = callback;
             this.msg = msg;
             msgUids = Select.from(MessageUid.class).where(Condition.prop("msg").eq(msg.getId())).list();
         }
@@ -106,14 +122,21 @@ public class Signer {
         protected void onPostExecute(Message.Security security) {
             msg.security = security;
             msg.save();
+            if (security == Message.Security.SECURE) {
+                callback.onSuccess();
+            } else {
+                callback.onFail();
+            }
         }
     }
 
     private static class AsyncVerifyTask extends AsyncTask<Void, Void, Message.Security> {
         private final Message msg;
         private final List<MessageUid> msgUids;
+        private final Callback callback;
 
-        public AsyncVerifyTask(Message msg) {
+        public AsyncVerifyTask(Message msg, Callback callback) {
+            this.callback = callback;
             this.msg = msg;
             msgUids = Select.from(MessageUid.class).where(Condition.prop("msg").eq(msg.getId())).list();
         }
@@ -141,9 +164,11 @@ public class Signer {
         protected void onPostExecute(Message.Security security) {
             if (security == Message.Security.UNVERIFIED) {
                 msg.delete();
+                callback.onFail();
             } else {
                 msg.security = security;
                 msg.save();
+                callback.onSuccess();
             }
         }
     }
