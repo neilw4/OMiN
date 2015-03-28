@@ -79,6 +79,16 @@ public class PKG {
             usersWriter.write(id + "\n");
             usersWriter.flush();
 
+            try {
+                usersChannel.close();
+                } catch (IOException e) {}
+            usersChannel = null;
+
+            try {
+                usersLock.release();
+            } catch (IOException e) {}
+            usersLock = null;
+
             Params params = new ReadParams(new FileParams.Reader(PARAMS_FILE, MPK_FILE, MSK_FILE));
 
             PS06MasterSecretKeyParameters msk = params.getMasterSecret();
