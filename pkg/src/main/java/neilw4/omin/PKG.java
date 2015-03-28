@@ -5,13 +5,11 @@ import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.PrintStream;
 import java.io.RandomAccessFile;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -32,15 +30,11 @@ public class PKG {
     public static final File MSK_FILE = new File("msk.params");
     public static final File MPK_FILE = new File("mpk.params");
     public static final File PARAMS_FILE = new File("cipher_params.params");
-    public static final File ERROR_LOG = new File("errors.log");
 
     public static void main(String args[]) {
         FileChannel usersChannel = null;
         FileLock usersLock = null;
         try {
-            // Redirect stderr to a file.
-            System.setErr(new PrintStream(new FileOutputStream(ERROR_LOG, true)));
-
             System.out.println("Content-type: text/plain");
 
             Hashtable form_data = cgi_lib.ReadParse(System.in);
@@ -72,6 +66,7 @@ public class PKG {
                if (id.equals(ln.trim())) {
                    // ID already exists.
                    System.out.println("Status: 401 Unauthorized\n");
+                   System.err.println("user " + id + " already exists");
                    return;
                }
             }
@@ -94,9 +89,12 @@ public class PKG {
                                     params.getMasterSecret()),
                             id);
 
+            long start = System.nanoTime();
             byte[] skBytes = Serialiser.serialiseSecret(sk);
             String skString = Base64.encodeToString(skBytes, Base64.NO_WRAP);
+            long end = System.nanoTime();
             System.out.println(skString);
+            System.err.println("user " + id + " created in " + ((end - start) / 1000000) + "ms");
 
         } catch (Exception e) {
             System.out.println("Status: 500 Internal Server Error\n");
