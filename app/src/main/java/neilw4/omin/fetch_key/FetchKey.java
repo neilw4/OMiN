@@ -53,12 +53,14 @@ public class FetchKey {
             info(TAG, "Fetching secret keys from PKG");
             try {
                 for (SecretKey pk: needsKey) {
+                    long start = System.nanoTime();
                     HttpGet get = new HttpGet(PKG_URL + "?id=" + pk.uid.uname);
                     HttpResponse response = client.execute(get);
+                    long end = System.nanoTime();
                     int statusCode = response.getStatusLine().getStatusCode();
                     if (statusCode == 200) {
                         pk.ps06Key = EntityUtils.toString(response.getEntity());
-                        info(TAG, "successfully got secret key for " + pk.uid.uname);
+                        info(TAG, "successfully got secret key for " + pk.uid.uname + " in " + ((end - start) / 1000000) + "ms");
                     } else if (statusCode == 401) {
                         // id already taken.
                         warn(TAG, "ID " + pk.uid.uname + " already taken");

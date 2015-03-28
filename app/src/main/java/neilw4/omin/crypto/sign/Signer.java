@@ -83,17 +83,17 @@ public class Signer {
             Message.Security secure = Message.Security.INSECURE;
             for (MessageUid msgUid: msgUids) {
                 if (msgUid.uid.parent == null) {
-                    long start = System.currentTimeMillis();
                     SecretKey sk = Select.from(SecretKey.class).where(Condition.prop("uid").eq(msgUid.uid.getId())).first();
                     if (sk.ps06Key != null) {
+                        long start = System.nanoTime();
                         byte[] skBytes = Base64.decode(sk.ps06Key, Base64.NO_WRAP);
                         PS06SecretKeyParameters skParams = Serialiser.deserialiseSecret(skBytes, msgUid.uid.uname, params.getMasterPublic(), params.getPairing());
                         byte[] sig = ps06.sign(msg.body, skParams);
                         msgUid.signature = Base64.encodeToString(sig, Base64.DEFAULT);
+                        long end = System.nanoTime();
                         msgUid.save();
-                        long time = System.currentTimeMillis() - start;
                         secure = Message.Security.SECURE;
-                        info(TAG, "signed message " + msg.sent + " for " + msgUid.uid.uname + " in " + time + "ms - " + sig.length + " bytes");
+                        info(TAG, "signed message " + msg.sent + " for " + msgUid.uid.uname + " in " + ((end - start) / 1000000) + "ms - " + sig.length + " bytes");
                     } else {
                         warn(TAG, "No secret key found for user " + msgUid.uid.uname);
                     }
@@ -123,14 +123,14 @@ public class Signer {
             Message.Security security = Message.Security.INSECURE;
             for (MessageUid msgUid: msgUids) {
                 if (msgUid.uid.parent == null && msgUid.signature != null) {
-                    long start = System.currentTimeMillis();
+                    long start = System.nanoTime();
                     byte[] sig = Base64.decode(msgUid.signature, Base64.DEFAULT);
                     if (!ps06.verify(params.getMasterPublic(), msg.body, msgUid.uid.uname, sig)) {
                         warn(TAG, "Message verification failed for message " + msg.sent + " from " + msgUid.uid.uname + " with signature " + msgUid.signature);
                         return Message.Security.UNVERIFIED;
                     }
-                    long time = System.currentTimeMillis() - start;
-                    info(TAG, "verified message " + msg.sent + " from " + msgUid.uid.uname + " in " + time + "ms");
+                    long end = System.nanoTime();
+                    info(TAG, "verified message " + msg.sent + " from " + msgUid.uid.uname + " in " + ((end - start) / 1000000) + "ms");
                     security = Message.Security.SECURE;
                 }
             }
