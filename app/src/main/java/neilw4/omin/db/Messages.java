@@ -53,7 +53,7 @@ public final class Messages extends SugarRecord<Messages> {
                     boolean canSend = true;
                     for (MessageUid uid: uids) {
                         if (uid.signature == null) {
-                            warn(TAG, "can't send message " + msg.sent + "because no signature for " + uid.uid.uname);
+                            warn(TAG, "can't send message " + msg + "because no signature for user");
                             canSend = false;
                             break;
                         }
@@ -78,7 +78,7 @@ public final class Messages extends SugarRecord<Messages> {
                     Select<Message> buffer = Select.from(Message.class).orderBy("last_sent");
                     while (buffer.count() > MAX_MESSAGES) {
                         Message evict = buffer.first();
-                        info(Message.TAG, "Evicted message " + evict.sent);
+                        info(Message.TAG, "Evicted message " + evict);
                         evict.delete();
                     }
                     return null;

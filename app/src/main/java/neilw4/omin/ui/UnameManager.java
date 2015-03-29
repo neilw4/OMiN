@@ -78,7 +78,7 @@ public class UnameManager {
                     SecretKey key = new SecretKey(uid);
                     key.save();
 
-                    info(TAG, "new uname: " + uname);
+                    info(TAG, "new uname");
                     setButtonEnabled(unameText.getText().toString());
 
                     FetchKey.asyncFetch();

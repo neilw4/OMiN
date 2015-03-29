@@ -51,7 +51,7 @@ public class P2PConnection implements ConnectionManager.ConnectionCallback {
     private void onConnected(BluetoothDevice device, InputStream in, OutputStream out) throws IOException {
         String myAddress = BluetoothAdapter.getDefaultAdapter().getAddress();
         String myName = BluetoothAdapter.getDefaultAdapter().getName();
-        info(TAG, myAddress + " (" + myName + ") connected to " + device.getAddress() + " (" + device.getName() + ")");
+        info(TAG, myAddress + " (" + myName + ") connected to " + device.getAddress());
         final BufferedReader reader = new BufferedReader(new InputStreamReader(in));
         final OutputStreamWriter writer = new OutputStreamWriter(out);
         final JsonWriter jsonWriter = new JsonWriter(writer);
@@ -87,7 +87,7 @@ public class P2PConnection implements ConnectionManager.ConnectionCallback {
         jsonWriter.endObject();
         writer.flush();
         jsonReader.endObject();
-        info(TAG, myAddress + " (" + myName + ") disconnected from " + device.getAddress() + " (" + device.getName() + ")");
+        info(TAG, myAddress + " (" + myName + ") disconnected from " + device.getAddress());
     }
 
     public void onFailure(String msg) {

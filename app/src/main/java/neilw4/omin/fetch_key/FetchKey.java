@@ -60,10 +60,10 @@ public class FetchKey {
                     int statusCode = response.getStatusLine().getStatusCode();
                     if (statusCode == 200) {
                         pk.ps06Key = EntityUtils.toString(response.getEntity());
-                        info(TAG, "successfully got secret key for " + pk.uid.uname + " in " + ((end - start) / 1000000) + "ms");
+                        info(TAG, "successfully got secret key in " + ((end - start) / 1000000) + "ms");
                     } else if (statusCode == 401) {
                         // id already taken.
-                        warn(TAG, "ID " + pk.uid.uname + " already taken");
+                        warn(TAG, "ID already taken");
                         pk.delete();
                     } else {
                         error(TAG, "PKG returned " + response.getStatusLine());

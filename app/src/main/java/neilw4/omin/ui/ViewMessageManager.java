@@ -7,9 +7,7 @@ import android.widget.ListView;
 
 import neilw4.omin.R;
 
-import static neilw4.omin.Logger.debug;
-import static neilw4.omin.Logger.info;
-import static neilw4.omin.Logger.warn;
+import static neilw4.omin.Logger.*;
 
 public class ViewMessageManager {
     private final Activity context;

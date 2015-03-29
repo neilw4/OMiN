@@ -83,6 +83,6 @@ public class SendMessageManager {
         });
 
         msg_text.getText().clear();
-        info(TAG, "new message: " + msg.sent);
+        info(TAG, "new message " + msg);
     }
 }

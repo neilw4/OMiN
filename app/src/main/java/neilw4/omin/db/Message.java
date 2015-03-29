@@ -98,9 +98,9 @@ public class Message extends SugarRecord<Message> {
             }
             User.consolidateUserIds(uids);
             Signer.asyncVerify(msg);
-            info(TAG, "received message " + sent + " from " + Arrays.toString(uids.toArray()));
+            info(TAG, "received message " + msg);
         } else {
-            debug(TAG, "message " + sent + "already exists");
+            debug(TAG, "message " + msg + "already exists");
         }
         return msg;
     }
@@ -116,7 +116,7 @@ public class Message extends SugarRecord<Message> {
 
         updateSent();
 
-        debug(TAG, "sent message " + body);
+        debug(TAG, "sent message " + toString());
         save();
     }
 
@@ -135,20 +135,20 @@ public class Message extends SugarRecord<Message> {
 
     @Override
     public String toString() {
-        StringWriter stringWriter = new StringWriter();
-        JsonWriter jsonWriter = new JsonWriter(stringWriter);
-        try {
-            write(jsonWriter);
-            jsonWriter.close();
-        } catch (IOException e) {
-            return body;
-        }
-        return stringWriter.toString();
+		if (sent != null) {
+			return hashCode() + " (" + sent.toString() + ")";
+		} else {
+			return "" + hashCode();
+		}
     }
 
     @Override
     public int hashCode() {
-        return body.hashCode() ^ (int)sent.getTime();
+		if (sent != null) {
+			return body.hashCode() ^ (int)sent.getTime();
+		} else {
+			return body.hashCode();
+		}
     }
 
 }
