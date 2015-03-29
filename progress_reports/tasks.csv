@@ -18,8 +18,8 @@ Number,Done,Status,Description,Type,Importance,Timescale,Depends0,Depends1
 21,Y,Done,Design encryption mechanism,task,Primary,Days,,
 20,Y,Done,Design a routing algorithm using user metadata to route messages while disguising message content and metadata,objective,Primary,Days,21,
 44,,Ready,Poster,objective,Primary,Days,20,6
-24,,Ready,Design smartphone UI,task,Secondary,Days,,
-23,,Blocked,Create a smartphone UI,objective,Secondary,Weeks,24,14
+24,Y,Done,Design smartphone UI,task,Secondary,Days,,
+23,,Ready,Create a smartphone UI,objective,Secondary,Weeks,24,
 28,Y,Done,design trust mechanism,task,Secondary,Days,,
 26,,Ready,Implement a more advanced routing algorithm,objective,Secondary,Weeks,20,
 27,,Blocked,Implement a mechanism to decide whether a node is trustworthy or not,objective,Secondary,Weeks,28,26
@@ -34,6 +34,6 @@ Number,Done,Status,Description,Type,Importance,Timescale,Depends0,Depends1
 43,Y,Done,publish on github,task,Tertiary,Days,16,
 ,,,,,,,,
 Primary,95%,,,,,,,
-Secondary,22%,,,,,,,
+Secondary,33%,,,,,,,
 Tertiary,20%,,,,,,,
-Total,64%,,,,,,,
+Total,67%,,,,,,,

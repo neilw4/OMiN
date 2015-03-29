@@ -6,6 +6,8 @@ local.properties
 *.iml
 app/*.iml
 pkg/*.iml
+pkg/*.params
+pkg/log.txt
 crypto/*.iml
 app/build
 pkg/build
