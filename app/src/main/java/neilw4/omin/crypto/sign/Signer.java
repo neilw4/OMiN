@@ -144,7 +144,7 @@ public class Signer {
         @Override
         protected Message.Security doInBackground(Void... ps) {
             Message.Security security = Message.Security.INSECURE;
-			long start = System.nanoTime();
+            long start = System.nanoTime();
             for (MessageUid msgUid: msgUids) {
                 if (msgUid.uid.parent == null && msgUid.signature != null) {
                     byte[] sig = Base64.decode(msgUid.signature, Base64.DEFAULT);
@@ -155,10 +155,10 @@ public class Signer {
                     security = Message.Security.SECURE;
                 }
             }
-			if (security == Message.Security.SECURE) {
-				long end = System.nanoTime();
-				info(TAG, "verified message " + msg +  " in " + ((end - start) / 1000000) + "ms");
-			}
+            if (security == Message.Security.SECURE) {
+                long end = System.nanoTime();
+                info(TAG, "verified message " + msg +  " in " + ((end - start) / 1000000) + "ms");
+            }
             return security;
         }
 
@@ -166,11 +166,15 @@ public class Signer {
         protected void onPostExecute(Message.Security security) {
             if (security == Message.Security.UNVERIFIED) {
                 msg.delete();
-                callback.onFail();
+                if (callback != null) {
+                    callback.onFail();
+                }
             } else {
                 msg.security = security;
                 msg.save();
-                callback.onSuccess();
+                if (callback != null) {
+                    callback.onSuccess();
+                }
             }
         }
     }
