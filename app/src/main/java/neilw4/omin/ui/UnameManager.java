@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.text.InputType;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -51,8 +52,18 @@ public class UnameManager {
             uname = myKey.uid.uname;
         }
 
-        mEditUname.setOnClickListener(new View.OnClickListener() {
+        mEditUname.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    endEdit();
+                    return true;
+                }
+                return false;
+            }
+        });
 
+        mEditUname.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 makeEditable();
