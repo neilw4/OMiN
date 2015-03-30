@@ -43,7 +43,7 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:appcompat-v7:22.+'
     compile 'com.github.satyan:sugar:1.3'
     compile group: 'com.google.guava', name: 'guava', version: '12.0'
     compile project(':crypto')

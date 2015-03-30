@@ -4,4 +4,8 @@
     <string name="app_name">OMiN</string>
     <string name="set_username">Set Username</string>
 
+    <string name="hello_world">Hello world!</string>
+
+    <string name="anonymous_uid">(anonymous)</string>
+
 </resources>
