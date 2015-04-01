@@ -97,7 +97,7 @@ public class Signer {
         @Override
         protected Message.Security doInBackground(Void... ps) {
             Message.Security secure = Message.Security.INSECURE;
-			long start = System.nanoTime();
+            long start = System.nanoTime();
             for (MessageUid msgUid: msgUids) {
                 if (msgUid.uid.parent == null) {
                     SecretKey sk = Select.from(SecretKey.class).where(Condition.prop("uid").eq(msgUid.uid.getId())).first();
@@ -113,8 +113,8 @@ public class Signer {
                     }
                 }
             }
-			long end = System.nanoTime();
-			info(TAG, "signed message " + msg + " in " + ((end - start) / 1000000) + "ms");
+            long end = System.nanoTime();
+            info(TAG, "signed message " + msg + " in " + ((end - start) / 1000000) + "ms");
             return secure;
         }
 

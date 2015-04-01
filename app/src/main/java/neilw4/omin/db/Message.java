@@ -135,20 +135,20 @@ public class Message extends SugarRecord<Message> {
 
     @Override
     public String toString() {
-		if (sent != null) {
-			return hashCode() + " (" + sent.toString() + ")";
-		} else {
-			return "" + hashCode();
-		}
+        if (sent != null) {
+            return hashCode() + " (" + sent.toString() + ")";
+        } else {
+            return "" + hashCode();
+        }
     }
 
     @Override
     public int hashCode() {
-		if (sent != null) {
-			return body.hashCode() ^ (int)sent.getTime();
-		} else {
-			return body.hashCode();
-		}
+        if (sent != null) {
+            return body.hashCode() ^ (int)sent.getTime();
+        } else {
+            return body.hashCode();
+        }
     }
 
 }
