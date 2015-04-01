@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"/>
 
     <ImageButton
-        android:id="@+id/edit_uname"
+        android:id="@+id/edit_uname_toggle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/edit_uname_text"

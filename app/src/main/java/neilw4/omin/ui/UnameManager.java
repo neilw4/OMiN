@@ -30,7 +30,7 @@ public class UnameManager {
     final Context mContext;
 
     final EditText mEditUname;
-    final ImageButton mEditBtn;
+    final ImageButton mToggleEdit;
 
     final Drawable editTextBg;
     private final InputMethodManager mInputManager;
@@ -41,7 +41,7 @@ public class UnameManager {
     public UnameManager(Context context, View root) {
         mContext = context;
         mEditUname = (EditText) root.findViewById(R.id.edit_uname_text);
-        mEditBtn = (ImageButton) root.findViewById(R.id.edit_uname);
+        mToggleEdit = (ImageButton) root.findViewById(R.id.edit_uname_toggle);
 
         mInputManager = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
 
@@ -70,7 +70,7 @@ public class UnameManager {
             }
         });
 
-        mEditBtn.setOnClickListener(new View.OnClickListener() {
+        mToggleEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (editable) {
@@ -88,9 +88,11 @@ public class UnameManager {
         if (editable) {
             mEditUname.setBackgroundDrawable(editTextBg);
             mEditUname.setInputType(InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS);
+            mToggleEdit.setImageResource(R.drawable.tick);
         } else {
             mEditUname.setBackgroundResource(android.R.color.transparent);
             mEditUname.setInputType(InputType.TYPE_NULL);
+            mToggleEdit.setImageResource(R.drawable.edit);
         }
 
         if (uname == null) {
