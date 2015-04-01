@@ -14,22 +14,11 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 
 import com.melnykov.fab.FloatingActionButton;
-import com.orm.query.Select;
-
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.List;
 
 import neilw4.omin.R;
-import neilw4.omin.connection.ConnectionServiceStarter;
-import neilw4.omin.crypto.sign.Signer;
 import neilw4.omin.db.Database;
-import neilw4.omin.db.Message;
-import neilw4.omin.db.MessageUid;
-import neilw4.omin.db.SecretKey;
 import neilw4.omin.ui.dummy.DummyContent;
 
-import static neilw4.omin.Logger.*;
 
 public class MessageFragment extends ListFragment {
 
@@ -75,8 +64,6 @@ public class MessageFragment extends ListFragment {
 
     class SendMessagePopup implements DialogInterface.OnClickListener {
 
-        String TAG = SendMessagePopup.class.getSimpleName();
-
         private final View mRoot;
         private final EditText mMessageContent;
 
@@ -104,15 +91,11 @@ public class MessageFragment extends ListFragment {
 
         }
 
-        public void sendMessage() {
-            String body = mMessageContent.getText().toString();
-            Database.sendMessage(body, getActivity());
-        }
-
         @Override
         public void onClick(DialogInterface dialog, int which) {
             if (which == DialogInterface.BUTTON_POSITIVE) {
-                sendMessage();
+                String body = mMessageContent.getText().toString();
+                Database.sendMessage(body, getActivity());
             }
         }
 
