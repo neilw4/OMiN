@@ -2,6 +2,8 @@ package neilw4.omin.db;
 
 import android.content.Context;
 
+import com.google.common.collect.Lists;
+import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import java.sql.Timestamp;
@@ -26,17 +28,15 @@ public class Database {
         }
 
         List<SecretKey> keys = Select.from(SecretKey.class).list();
-        if (keys.isEmpty()) {
-            warn(TAG, "Couldn't send message: no user id");
-            return false;
-        }
 
         Message msg = new Message(body, new Timestamp(new Date().getTime()));
         msg.save();
 
         for (SecretKey key: keys) {
-            MessageUid uid = new MessageUid(key.uid, msg);
-            uid.save();
+            if (key.ps06Key != null) {
+                MessageUid uid = new MessageUid(key.uid, msg);
+                uid.save();
+            }
         }
 
         Signer.setResources(context.getResources());
@@ -52,5 +52,18 @@ public class Database {
         });
         info(TAG, "new message " + msg);
         return true;
+    }
+
+    public static List<Message> getMessages() {
+        //TODO: only interested messages
+        return Lists.reverse(Select.from(Message.class).orderBy("sent").list());
+    }
+
+    public static UserId getUidFor(Message msg) {
+        MessageUid msgUid = Select.from(MessageUid.class).where(Condition.prop("msg").eq(msg.getId())).first();
+        if (msgUid != null) {
+            return msgUid.uid;
+        }
+        return null;
     }
 }

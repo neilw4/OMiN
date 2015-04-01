@@ -35,6 +35,11 @@ android {
     dexOptions {
         preDexLibraries = false
     }
+
+    packagingOptions {
+        exclude 'META-INF/services/org.ocpsoft.prettytime.PrettyTime'
+        exclude 'META-INF/INDEX.LIST'
+    }
 }
 
 repositories {
@@ -47,5 +52,6 @@ dependencies {
     compile 'com.github.satyan:sugar:1.3'
     compile group: 'com.google.guava', name: 'guava', version: '12.0'
     compile 'com.melnykov:floatingactionbutton:1.2.0'
+    compile 'org.ocpsoft.prettytime:prettytime-integration-jsf:3.2.7.Final'
     compile project(':crypto')
 }
