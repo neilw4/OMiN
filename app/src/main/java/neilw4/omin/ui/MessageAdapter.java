@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.Locale;
 
 import neilw4.omin.R;
-import neilw4.omin.db.Database;
+import neilw4.omin.controller.MessageController;
+import neilw4.omin.controller.UnameController;
 import neilw4.omin.db.Message;
 import neilw4.omin.db.UserId;
 
@@ -23,7 +24,7 @@ public class MessageAdapter extends BaseAdapter {
 
     public MessageAdapter(LayoutInflater inflater) {
         super();
-        messages = Database.getMessages();
+        messages = MessageController.getMessages();
         this.inflater = inflater;
     }
 
@@ -57,7 +58,7 @@ public class MessageAdapter extends BaseAdapter {
     }
 
     private View setText(final View v, final Message msg) {
-        UserId uid = Database.getUidFor(msg);
+        UserId uid = UnameController.getUidFor(msg);
         String user_name;
         if (uid == null) {
             user_name = "(anonymous)";
@@ -81,7 +82,7 @@ public class MessageAdapter extends BaseAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        messages = Database.getMessages();
+        messages = MessageController.getMessages();
         super.notifyDataSetChanged();
     }
 

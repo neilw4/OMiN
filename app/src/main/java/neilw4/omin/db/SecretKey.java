@@ -7,9 +7,15 @@ import static junit.framework.Assert.assertTrue;
 public class SecretKey extends SugarRecord<SecretKey> {
     public UserId uid;
     public String ps06Key = null;
+    public boolean inUse = false;
 
     public SecretKey(UserId uid) {
         this.uid = uid;
+    }
+
+    public SecretKey(UserId uid, boolean inUse) {
+        this(uid);
+        this.inUse = inUse;
     }
 
     public SecretKey(UserId uid, String ps06Key) {

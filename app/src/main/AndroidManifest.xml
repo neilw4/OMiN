@@ -56,7 +56,7 @@
             android:value="omin.db" />
         <meta-data
             android:name="VERSION"
-            android:value="11" />
+            android:value="12" />
         <meta-data
             android:name="QUERY_LOG"
             android:value="true" />
@@ -64,7 +64,7 @@
             android:name="DOMAIN_PACKAGE_NAME"
             android:value="neilw4.omin" />
         <receiver
-            android:name=".fetch_key.NetConnectionReciever"
+            android:name=".controller.fetch_key.NetConnectionReciever"
             android:enabled="true"
             android:exported="true" >
             <intent-filter>

@@ -1,4 +1,4 @@
-package neilw4.omin.fetch_key;
+package neilw4.omin.controller.fetch_key;
 
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
@@ -25,11 +25,19 @@ public class FetchKey {
     private static volatile AsyncFetchTask asyncFetchTask = null;
 
     public static void asyncFetch() {
+        asyncFetch(Select.from(SecretKey.class).list());
+    }
+
+    public static void asyncFetch(List<SecretKey> secretKeys) {
         List<SecretKey> needsKey = new ArrayList<>();
-        for (SecretKey pk: Select.from(SecretKey.class).list()) {
+        for (SecretKey pk: secretKeys) {
             if (pk.ps06Key == null) {
                 needsKey.add(pk);
             }
+        }
+
+        if (asyncFetchTask != null) {
+            asyncFetchTask.cancel(true);
         }
 
         if (asyncFetchTask == null && !needsKey.isEmpty()) {
@@ -38,6 +46,7 @@ public class FetchKey {
         }
     }
 
+    //TODO: use worker pattern.
     private static class AsyncFetchTask extends AsyncTask<Void, Void, Void> {
 
         private static final String TAG = AsyncFetchTask.class.getSimpleName();
@@ -58,8 +67,12 @@ public class FetchKey {
                     HttpResponse response = client.execute(get);
                     long end = System.nanoTime();
                     int statusCode = response.getStatusLine().getStatusCode();
+                    if (isCancelled()) {
+                        return null;
+                    }
                     if (statusCode == 200) {
                         pk.ps06Key = EntityUtils.toString(response.getEntity());
+                        pk.save();
                         info(TAG, "successfully got secret key in " + ((end - start) / 1000000) + "ms");
                     } else if (statusCode == 401) {
                         // id already taken.

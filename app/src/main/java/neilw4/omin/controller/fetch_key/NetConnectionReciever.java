@@ -1,4 +1,4 @@
-package neilw4.omin.fetch_key;
+package neilw4.omin.controller.fetch_key;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

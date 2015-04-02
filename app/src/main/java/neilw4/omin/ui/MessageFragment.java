@@ -15,7 +15,7 @@ import android.widget.EditText;
 import com.melnykov.fab.FloatingActionButton;
 
 import neilw4.omin.R;
-import neilw4.omin.db.Database;
+import neilw4.omin.controller.MessageController;
 
 
 public class MessageFragment extends ListFragment {
@@ -86,7 +86,7 @@ public class MessageFragment extends ListFragment {
         public void onClick(DialogInterface dialog, int which) {
             if (which == DialogInterface.BUTTON_POSITIVE) {
                 String body = mMessageContent.getText().toString();
-                if (Database.sendMessage(body, getActivity())) {
+                if (MessageController.sendMessage(body, getActivity())) {
                     adapter.notifyDataSetChanged();
                 }
             }
