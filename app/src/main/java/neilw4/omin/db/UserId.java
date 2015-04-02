@@ -8,6 +8,7 @@ import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import static junit.framework.Assert.*;
+import static neilw4.omin.Logger.warn;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ import neilw4.omin.datastructure.BloomFilter;
 
 public class UserId extends SugarRecord<UserId> {
 
+    private static final String TAG = UserId.class.getSimpleName();
     public User user;
     public UserId parent;
     public String uname;
@@ -60,7 +62,11 @@ public class UserId extends SugarRecord<UserId> {
     }
 
     public static boolean valid(String uname) {
-        return Pattern.matches("[a-z]+[a-z0-9]*", uname);
+        boolean isValid = Pattern.matches("[a-z]+[a-z0-9]*", uname);
+        if (!isValid) {
+            warn(TAG, "Invalid username format");
+        }
+        return isValid;
     }
 
     protected static List<UserId> readUids(final JsonReader reader) throws IOException {

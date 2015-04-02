@@ -6,5 +6,10 @@
     <string name="anonymous_uname">(anonymous)</string>
     <string name="send">Send</string>
     <string name="new_message">New Message</string>
+    <string name="user_name">Name</string>
+    <string name="user_id">ID</string>
+    <string name="follow">Follow</string>
+    <string name="message_singular">message</string>
+    <string name="message_plural">messages</string>
 
 </resources>

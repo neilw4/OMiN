@@ -7,14 +7,14 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import neilw4.omin.Logger;
 import neilw4.omin.R;
-import neilw4.omin.ui.uname.UnameManager;
+import neilw4.omin.ui.uname.UnameBar;
 
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
     SectionsPagerAdapter mSectionsPagerAdapter;
     ViewPager mViewPager;
-    UnameManager mUidManager;
+    UnameBar mUidManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +48,7 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
 
         actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
         actionBar.setCustomView(R.layout.actionbar_main);
-        mUidManager = new UnameManager(this, actionBar.getCustomView());
+        mUidManager = new UnameBar(this, actionBar.getCustomView());
     }
 
     @Override

@@ -13,9 +13,7 @@ import neilw4.omin.db.UserId;
 import neilw4.omin.controller.fetch_key.FetchKey;
 
 import static junit.framework.Assert.assertTrue;
-import static neilw4.omin.Logger.debug;
-import static neilw4.omin.Logger.info;
-import static neilw4.omin.Logger.warn;
+import static neilw4.omin.Logger.*;
 
 public class UnameController {
 
@@ -38,7 +36,6 @@ public class UnameController {
 
     public static boolean setUname(final String uname) {
         if (uname != null && !UserId.valid(uname)) {
-            warn(TAG, "Invalid username format");
             return false;
         }
 

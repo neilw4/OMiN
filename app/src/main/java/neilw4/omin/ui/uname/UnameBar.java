@@ -16,7 +16,7 @@ import neilw4.omin.R;
 import neilw4.omin.controller.UnameController;
 import neilw4.omin.db.SecretKey;
 
-public class UnameManager {
+public class UnameBar {
 
     final Context mContext;
 
@@ -29,7 +29,7 @@ public class UnameManager {
     boolean editable = false;
     String uname = null;
 
-    public UnameManager(Context context, View root) {
+    public UnameBar(Context context, View root) {
         mContext = context;
         mEditUname = (EditText) root.findViewById(R.id.edit_uname_text);
         mToggleEdit = (ImageButton) root.findViewById(R.id.edit_uname_toggle);

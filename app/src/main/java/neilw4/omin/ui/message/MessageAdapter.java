@@ -24,7 +24,7 @@ public class MessageAdapter extends BaseAdapter {
 
     public MessageAdapter(LayoutInflater inflater) {
         super();
-        messages = MessageController.getMessages();
+        updateMessages();
         this.inflater = inflater;
     }
 
@@ -34,7 +34,7 @@ public class MessageAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public Message getItem(int position) {
         return messages.get(position);
     }
 
@@ -45,7 +45,7 @@ public class MessageAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        Message msg = (Message) getItem(position);
+        Message msg = getItem(position);
         if (convertView != null) {
             try {
                 return setText(convertView, msg);
@@ -82,8 +82,12 @@ public class MessageAdapter extends BaseAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        messages = MessageController.getMessages();
+        updateMessages();
         super.notifyDataSetChanged();
+    }
+
+    private void updateMessages() {
+        messages = MessageController.getMessages();
     }
 
 }
