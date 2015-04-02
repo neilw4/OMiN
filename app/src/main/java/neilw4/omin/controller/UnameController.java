@@ -77,13 +77,13 @@ public class UnameController {
         return uid;
     }
 
-
     private static SecretKey makeSecretKey(UserId uid) {
         SecretKey key = Select.from(SecretKey.class).where(Condition.prop("uid").eq(uid.getId())).first();
         if (key == null) {
-            key = new SecretKey(uid, true);
-            key.save();
+            key = new SecretKey(uid);
         }
+        key.inUse = true;
+        key.save();
         if (key.ps06Key == null) {
             FetchKey.asyncFetch(Collections.singletonList(key));
         }
