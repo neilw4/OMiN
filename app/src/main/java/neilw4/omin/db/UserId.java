@@ -60,7 +60,7 @@ public class UserId extends SugarRecord<UserId> {
     }
 
     public static boolean valid(String uname) {
-        return Pattern.matches("[a-z]+", uname);
+        return Pattern.matches("[a-z]+[a-z0-9]*", uname);
     }
 
     protected static List<UserId> readUids(final JsonReader reader) throws IOException {

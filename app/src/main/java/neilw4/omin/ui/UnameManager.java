@@ -146,6 +146,7 @@ public class UnameManager {
     public boolean saveUname() {
         if (uname != null && !UserId.valid(uname)) {
             uname = null;
+            warn(TAG, "Invalid username format");
             return false;
         }
 

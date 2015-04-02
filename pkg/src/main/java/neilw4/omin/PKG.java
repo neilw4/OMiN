@@ -46,7 +46,7 @@ public class PKG {
             }
 
             String id = ((String)form_data.get("id")).trim();
-            if (!id.matches("[a-z]+")) {
+            if (!id.matches("[a-z]+[a-z0-9]*")) {
                 System.out.println("Status: 400 Bad Request\n");
                 return;
             }
