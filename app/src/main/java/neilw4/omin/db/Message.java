@@ -8,7 +8,6 @@ import com.orm.query.Condition;
 import com.orm.query.Select;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,12 +25,12 @@ public class Message extends SugarRecord<Message> {
     public static enum Security {UNVERIFIED, SECURE, INSECURE}
 
     public String body;
-    public Timestamp sent;
-    public Timestamp lastSent = null;
+    public Date sent;
+    public Date lastSent = null;
     public Security security = Security.UNVERIFIED;
 
 
-    public Message(String body, Timestamp sent) {
+    public Message(String body, Date sent) {
         this.body = body;
         this.sent = sent;
         updateSent();
@@ -44,10 +43,10 @@ public class Message extends SugarRecord<Message> {
 
     private void updateSent() {
         // Record that the message is being sent.
-        this.lastSent = new Timestamp(new Date().getTime());
+        this.lastSent = new Date();
     }
 
-    private static Message findInDb(String body, Timestamp sent, List<MessageUid> msgUids) {
+    private static Message findInDb(String body, Date sent, List<MessageUid> msgUids) {
         for (MessageUid msgUid: msgUids) {
             MessageUid matchMsgUid = Select.from(MessageUid.class)
                     .where(
@@ -71,7 +70,7 @@ public class Message extends SugarRecord<Message> {
         assertEquals("body", reader.nextName());
         String body = reader.nextString();
         assertEquals("sent", reader.nextName());
-        Timestamp sent = new Timestamp(reader.nextLong());
+        Date sent = new Date(reader.nextLong());
 
         // Get the user ids and infer the user.
         assertEquals("user", reader.nextName());

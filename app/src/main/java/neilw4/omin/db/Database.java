@@ -6,7 +6,6 @@ import com.google.common.collect.Lists;
 import com.orm.query.Condition;
 import com.orm.query.Select;
 
-import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class Database {
 
         List<SecretKey> keys = Select.from(SecretKey.class).list();
 
-        Message msg = new Message(body, new Timestamp(new Date().getTime()));
+        Message msg = new Message(body, new Date());
         msg.save();
 
         for (SecretKey key: keys) {
