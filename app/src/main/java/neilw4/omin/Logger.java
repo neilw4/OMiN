@@ -92,17 +92,19 @@ public final class Logger {
 
     // http://stackoverflow.com/a/20072918
     public static synchronized void toast(final String msg) {
-        try {
-            new Thread() {
-                @Override
-                public void run() {
-                    Looper.prepare();
-                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-                    Looper.loop();
-                }
-            }.start();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        if (context != null) {
+            try {
+                new Thread() {
+                    @Override
+                    public void run() {
+                        Looper.prepare();
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                        Looper.loop();
+                    }
+                }.start();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
