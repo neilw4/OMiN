@@ -1,4 +1,4 @@
-package neilw4.omin.ui;
+package neilw4.omin.ui.message;
 
 import android.view.LayoutInflater;
 import android.view.View;

@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import neilw4.omin.Logger;
 import neilw4.omin.R;
+import neilw4.omin.ui.uname.UnameManager;
 
 
 public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {

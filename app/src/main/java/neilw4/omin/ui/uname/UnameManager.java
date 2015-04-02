@@ -1,4 +1,4 @@
-package neilw4.omin.ui;
+package neilw4.omin.ui.uname;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
