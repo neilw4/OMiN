@@ -31,7 +31,7 @@ public class FollowController {
             return false;
         }
 
-        UserId uid = Select.from(UserId.class).where(Condition.prop("uname").eq(name)).first();
+        UserId uid = Select.from(UserId.class).where(Condition.prop("uname").eq(id)).first();
 
 
         if (uid == null) {
@@ -55,8 +55,7 @@ public class FollowController {
     public static int countMessages(User user) {
         Set<Message> messages = new HashSet<>();
         for (UserId uid: Select.from(UserId.class).where(Condition.prop("user").eq(user.getId())).list()) {
-            for (MessageUid msgUid: Select.from(MessageUid.class)/*.where(Condition.prop("uid").eq(uid.getId()))*/.list()) {
-                //TODO: fix
+            for (MessageUid msgUid: Select.from(MessageUid.class).where(Condition.prop("uid").eq(uid.getId())).list()) {
                 messages.add(msgUid.msg);
             }
         }
