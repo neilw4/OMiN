@@ -10,7 +10,7 @@ import neilw4.omin.datastructure.BloomFilter;
 
 public class User extends SugarRecord<User> {
     public String name;
-    public boolean interested = false;
+    public boolean following = false;
 
     public User(String name) {
         this.name = name;
@@ -21,8 +21,8 @@ public class User extends SugarRecord<User> {
         // Sugar ORM requires an empty constructor.
     }
 
-    public static List<User> interestedUsers() {
-        return Select.from(User.class).where(Condition.prop("interested").eq(true)).list();
+    public static List<User> followingUsers() {
+        return Select.from(User.class).where(Condition.prop("following").eq(true)).list();
     }
 
     protected static User consolidateUserIds(List<UserId> uids) {

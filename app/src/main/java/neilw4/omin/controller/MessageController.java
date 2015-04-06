@@ -61,7 +61,7 @@ public class MessageController {
     }
 
     public static List<Message> getMessages() {
-        //TODO: only interested messages
+        //TODO: only following messages
         return Lists.reverse(Select.from(Message.class).orderBy("sent").list());
     }
 

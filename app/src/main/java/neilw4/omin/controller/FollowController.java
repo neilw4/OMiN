@@ -19,11 +19,11 @@ public class FollowController {
     private static final String TAG = FollowController.class.getSimpleName();
 
     public static List<User> getFollowing() {
-        return Select.from(User.class).where(Condition.prop("interested").eq(1)).orderBy("name").list();
+        return Select.from(User.class).where(Condition.prop("following").eq(1)).orderBy("name").list();
     }
 
     public static void unfollow(User user) {
-        user.interested = false;
+        user.following = false;
         user.save();
     }
 
@@ -51,7 +51,7 @@ public class FollowController {
             return false;
         }
         uid.user.name = name;
-        uid.user.interested = true;
+        uid.user.following = true;
         uid.user.save();
         uid.save();
         return true;

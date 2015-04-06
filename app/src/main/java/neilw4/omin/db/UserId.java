@@ -105,9 +105,9 @@ public class UserId extends SugarRecord<UserId> {
     }
 
 
-    public static BloomFilter<UserId> interestedUserIds() {
+    public static BloomFilter<UserId> followingUserIds() {
         BloomFilter<UserId> filter = new BloomFilter<UserId>(20, 2);
-        for (User user: User.interestedUsers()) {
+        for (User user: User.followingUsers()) {
             for (UserId id: Select.from(UserId.class).where(Condition.prop("user").eq(user.getId())).list()) {
                 filter.put(id);
             }

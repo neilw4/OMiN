@@ -7,8 +7,6 @@ import android.os.Handler;
 import android.util.JsonReader;
 import android.util.JsonWriter;
 
-import android.widget.Toast;
-
 import com.orm.MySugarTransactionHelper;
 import com.orm.query.Select;
 
@@ -60,21 +58,21 @@ public class P2PConnection implements ConnectionManager.ConnectionCallback {
         jsonReader.setLenient(false);
 
         jsonWriter.beginObject();
-        jsonWriter.name("interested");
+        jsonWriter.name("following");
 
         MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
             @Override
             public Void manipulateInTransaction() throws IOException {
-                BloomFilter<UserId> interested = UserId.interestedUserIds();
-                interested.write(jsonWriter);
+                BloomFilter<UserId> following = UserId.followingUserIds();
+                following.write(jsonWriter);
                 return null;
             }
         });
         writer.flush();
 
         jsonReader.beginObject();
-        assertEquals("interested", jsonReader.nextName());
-        BloomFilter<UserId> partnerInterested = BloomFilter.read(jsonReader);
+        assertEquals("following", jsonReader.nextName());
+        BloomFilter<UserId> partnerFollowing = BloomFilter.read(jsonReader);
 
         jsonWriter.name("messages");
 
