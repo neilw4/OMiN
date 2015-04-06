@@ -13,6 +13,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.melnykov.fab.FloatingActionButton;
+import com.nhaarman.listviewanimations.itemmanipulation.DynamicListView;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.SimpleSwipeUndoAdapter;
+import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.TimedUndoAdapter;
 
 import neilw4.omin.R;
 import neilw4.omin.controller.FollowController;
@@ -42,10 +45,15 @@ public class FollowFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         inflater = getLayoutInflater(savedInstanceState);
         adapter = new FollowAdapter(inflater);
-        setListAdapter(adapter);
+        SimpleSwipeUndoAdapter undoAdapter = new TimedUndoAdapter(adapter, getActivity(), adapter);
+        undoAdapter.setAbsListView(getListView());
+        setListAdapter(undoAdapter);
+
+        DynamicListView list = (DynamicListView) getListView();
+        list.enableSwipeUndo(undoAdapter);
 
         FloatingActionButton fab = (FloatingActionButton)getView().findViewById(R.id.new_follow_fab);
-        fab.attachToListView(getListView());
+        fab.attachToListView(list);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

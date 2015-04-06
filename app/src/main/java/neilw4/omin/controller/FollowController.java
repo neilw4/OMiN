@@ -22,6 +22,11 @@ public class FollowController {
         return Select.from(User.class).where(Condition.prop("interested").eq(1)).orderBy("name").list();
     }
 
+    public static void unfollow(User user) {
+        user.interested = false;
+        user.save();
+    }
+
     public static List<UserId> getUids(User user) {
         return Select.from(UserId.class).where(Condition.prop("user").eq(user.getId())).orderBy("uname").list();
     }

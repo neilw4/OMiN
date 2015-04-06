@@ -53,5 +53,7 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '12.0'
     compile 'com.melnykov:floatingactionbutton:1.2.0'
     compile 'org.ocpsoft.prettytime:prettytime-integration-jsf:3.2.7.Final'
+    compile 'com.nhaarman.listviewanimations:lib-core:3.1.0@aar'
+    compile 'com.nhaarman.listviewanimations:lib-manipulation:3.1.0@aar'
     compile project(':crypto')
 }

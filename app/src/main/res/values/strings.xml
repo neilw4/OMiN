@@ -11,5 +11,7 @@
     <string name="follow">Follow</string>
     <string name="message_singular">message</string>
     <string name="message_plural">messages</string>
+    <string name="user_unfollowed">Stopped following</string>
+    <string name="taptoundo">Tap to undo</string>
 
 </resources>
