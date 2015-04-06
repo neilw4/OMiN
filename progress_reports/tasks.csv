@@ -19,7 +19,7 @@ Number,Done,Status,Description,Type,Importance,Timescale,Depends0,Depends1
 20,Y,Done,Design a routing algorithm using user metadata to route messages while disguising message content and metadata,objective,Primary,Days,21,
 44,,Ready,Poster,objective,Primary,Days,20,6
 24,Y,Done,Design smartphone UI,task,Secondary,Days,,
-23,,Ready,Create a smartphone UI,objective,Secondary,Weeks,24,
+23,Y,Done,Create a smartphone UI,objective,Secondary,Weeks,24,
 28,Y,Done,design trust mechanism,task,Secondary,Days,,
 26,,Ready,Implement a more advanced routing algorithm,objective,Secondary,Weeks,20,
 27,,Blocked,Implement a mechanism to decide whether a node is trustworthy or not,objective,Secondary,Weeks,28,26
@@ -30,10 +30,10 @@ Number,Done,Status,Description,Type,Importance,Timescale,Depends0,Depends1
 36,,Ready,set up simulation,task,Tertiary,Weeks,,
 37,,Blocked,run simulation,task,Tertiary,Days,36,
 35,,Blocked,Compare the real world vs simulated performance of the routing algorithms,objective,Tertiary,Weeks,37,
-42,,Blocked,publish on app store,task,Tertiary,Days,23,
+42,Y,Done,publish on app store,task,Tertiary,Days,23,
 43,Y,Done,publish on github,task,Tertiary,Days,16,
 ,,,,,,,,
 Primary,95%,,,,,,,
-Secondary,33%,,,,,,,
-Tertiary,20%,,,,,,,
-Total,67%,,,,,,,
+Secondary,44%,,,,,,,
+Tertiary,40%,,,,,,,
+Total,73%,,,,,,,

@@ -3,8 +3,10 @@ package neilw4.omin.controller;
 import android.content.Context;
 
 import com.google.common.collect.Lists;
+import com.orm.query.Condition;
 import com.orm.query.Select;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -27,9 +29,7 @@ public class MessageController {
             return false;
         }
 
-
         SecretKey key = UnameController.getSecretKey();
-
 
         if (key != null && key.ps06Key == null) {
             warn(TAG, "No secret key for user. Try sending an anonymous message.");
@@ -61,8 +61,21 @@ public class MessageController {
     }
 
     public static List<Message> getMessages() {
-        //TODO: only following messages
-        return Lists.reverse(Select.from(Message.class).orderBy("sent").list());
+        List<Message> allMessages = Lists.reverse(Select.from(Message.class).orderBy("sent").list());
+        List<Message> showMessages = new ArrayList<>();
+        for (Message message: allMessages) {
+            boolean showMessage = false;
+            for (MessageUid msgUid: Select.from(MessageUid.class).where(Condition.prop("msg").eq(message.getId())).list()) {
+                if (msgUid.uid.user.following) {
+                    showMessage = true;
+                    break;
+                }
+            }
+            if (showMessage) {
+                showMessages.add(message);
+            }
+        }
+        return showMessages;
     }
 
 }
