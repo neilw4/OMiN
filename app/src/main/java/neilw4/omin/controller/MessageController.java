@@ -64,8 +64,9 @@ public class MessageController {
         List<Message> allMessages = Lists.reverse(Select.from(Message.class).orderBy("sent").list());
         List<Message> showMessages = new ArrayList<>();
         for (Message message: allMessages) {
-            boolean showMessage = false;
-            for (MessageUid msgUid: Select.from(MessageUid.class).where(Condition.prop("msg").eq(message.getId())).list()) {
+            List<MessageUid> msgUids = Select.from(MessageUid.class).where(Condition.prop("msg").eq(message.getId())).list();
+            boolean showMessage = msgUids.isEmpty(); // Show anonymous messages.
+            for (MessageUid msgUid: msgUids) {
                 if (msgUid.uid.user.following) {
                     showMessage = true;
                     break;
