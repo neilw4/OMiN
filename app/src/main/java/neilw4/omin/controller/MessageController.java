@@ -22,6 +22,8 @@ public class MessageController {
 
     private static final String TAG = MessageController.class.getSimpleName();
 
+    private static OnMessagesChangedListener listener;
+
     public static boolean sendMessage(String body, final Context context) {
 
         if (body.length() == 0) {
@@ -55,6 +57,8 @@ public class MessageController {
                 public void onFail() {
                 }
             });
+        } else {
+            ConnectionServiceStarter.start(context.getApplicationContext());
         }
         info(TAG, "new message " + msg);
         return true;
@@ -70,6 +74,9 @@ public class MessageController {
                 if (msgUid.uid.user != null && msgUid.uid.user.following) {
                     showMessage = true;
                     break;
+                } else if (Select.from(SecretKey.class).where(Condition.prop("uid").eq(msgUid.uid.getId())).first() != null) {
+                    showMessage = true;
+                    break;
                 }
             }
             if (showMessage) {
@@ -77,6 +84,24 @@ public class MessageController {
             }
         }
         return showMessages;
+    }
+
+    public static void onMessagesChanged() {
+        if (listener != null) {
+            listener.onMessagesChanged();
+        }
+    }
+
+    public static void addChangeListener(OnMessagesChangedListener listener) {
+        MessageController.listener = listener;
+    }
+
+    public static void removeChangeListener() {
+        listener = null;
+    }
+
+    public interface OnMessagesChangedListener {
+        public void onMessagesChanged();
     }
 
 }

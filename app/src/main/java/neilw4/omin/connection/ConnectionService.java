@@ -34,7 +34,7 @@ public class ConnectionService extends IntentService {
     public static final String ACTION_SCAN = "neilw4.omin.BluetoothService.SCAN";
 
     // Start bluetooth discovery after REPEAT_SECONDS seconds.
-    public static final int REPEAT_SECONDS = 900;
+    public static final int REPEAT_SECONDS = 450;
 
     public ConnectionService() {
         super(TAG);
@@ -231,7 +231,7 @@ public class ConnectionService extends IntentService {
         }
 
         if (uuid != null && ConnectionManager.uuidMatches(uuid) && !ominDevices.containsKey(address)) {
-            debug(TAG, "found OMiN device " + device.getAddress() + " (" + device.getName() + ")");
+            debug(TAG, "found OMiN device " + device.getAddress());
             ominDevices.put(address, device);
             if (!recentDevices.contains(address) && connection.isListening()) {
                 debug(TAG, device.getName() + " not contacted recently. Connecting");

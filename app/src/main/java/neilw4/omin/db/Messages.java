@@ -12,8 +12,10 @@ import com.orm.query.Select;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
 import java.util.List;
 
+import neilw4.omin.controller.MessageController;
 import neilw4.omin.datastructure.BloomFilter;
 
 import static neilw4.omin.Logger.*;
@@ -21,33 +23,37 @@ import static neilw4.omin.Logger.*;
 public final class Messages extends SugarRecord<Messages> {
 
     public static final String TAG = Messages.class.getSimpleName();
-    public static final int MAX_MESSAGES = 10;
+    public static final int MAX_MESSAGES = 15;
 
     @SuppressWarnings("unused")
     public Messages() {
         // Sugar ORM requires an empty constructor.
     }
-    public static void read(final JsonReader reader) throws IOException {
+    public static int read(final JsonReader reader) throws IOException {
         reader.setLenient(false);
         reader.beginArray();
-        MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
+        int count = MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Integer>() {
             @Override
-            public Void manipulateInTransaction() throws IOException {
+            public Integer manipulateInTransaction() throws IOException {
+                int count = 0;
                 while(reader.hasNext()) {
                     Message.read(reader);
+                    count += 1;
                 }
-                return null;
+                return count;
             }
         });
         reader.endArray();
+        return count;
     }
 
-    public static void write(final JsonWriter writer, final List<Message> messages) throws IOException {
+    public static int write(final JsonWriter writer, final List<Message> messages) throws IOException {
         writer.setLenient(false);
         writer.beginArray();
-        MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
+        int count = MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Integer>() {
             @Override
-            public Void manipulateInTransaction() throws IOException {
+            public Integer manipulateInTransaction() throws IOException {
+                int count = 0;
                 for (Message msg: messages) {
                     List<MessageUid> uids = Select.from(MessageUid.class).where(Condition.prop("msg").eq(msg.getId())).list();
                     boolean canSend = true;
@@ -61,12 +67,14 @@ public final class Messages extends SugarRecord<Messages> {
 
                     if (canSend) {
                         msg.write(writer);
+                        count += 1;
                     }
                 }
-                return null;
+                return count;
             }
         });
         writer.endArray();
+        return count;
     }
 
     public static void evict() {
@@ -74,12 +82,16 @@ public final class Messages extends SugarRecord<Messages> {
             MySugarTransactionHelper.doInTransaction(new MySugarTransactionHelper.Callback<Void>() {
                 @Override
                 public Void manipulateInTransaction() {
-                    // TODO: check this evicts the oldest message, not the youngest.
                     Select<Message> buffer = Select.from(Message.class).orderBy("last_sent");
+                    int evicted = 0;
                     while (buffer.count() > MAX_MESSAGES) {
                         Message evict = buffer.first();
                         info(Message.TAG, "Evicted message " + evict);
                         evict.delete();
+                        evicted += 1;
+                    }
+                    if (evicted > 0) {
+                        MessageController.onMessagesChanged();
                     }
                     return null;
                 }

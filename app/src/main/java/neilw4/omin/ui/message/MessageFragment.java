@@ -21,8 +21,9 @@ import neilw4.omin.ui.Refreshable;
 import static neilw4.omin.Logger.warn;
 
 
-public class MessageFragment extends ListFragment implements Refreshable {
+public class MessageFragment extends ListFragment implements Refreshable, MessageController.OnMessagesChangedListener {
 
+    private static final String TAG = MessageFragment.class.getSimpleName();
     private MessageAdapter adapter;
     private LayoutInflater inflater;
 
@@ -58,8 +59,34 @@ public class MessageFragment extends ListFragment implements Refreshable {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        MessageController.addChangeListener(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        MessageController.removeChangeListener();
+    }
+
+    @Override
     public void refresh() {
         adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onMessagesChanged() {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ((Refreshable) getActivity()).refresh();
+                } catch (NullPointerException | ClassCastException e) {
+                    warn(TAG, "Error while refreshing messages", e);
+                }
+            }
+        });
     }
 
     class SendMessagePopup implements DialogInterface.OnClickListener {

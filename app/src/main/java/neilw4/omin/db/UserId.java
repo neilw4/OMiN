@@ -43,10 +43,10 @@ public class UserId extends SugarRecord<UserId> {
             String uid = reader.nextString();
             // Pull ID from database if it exists.
             UserId child = Select.from(UserId.class).where(
-                    Condition.prop("uname").eq(uid),
-                    userId == null ?
-                            Condition.prop("parent").notLike("%") : // Sugar doesn't support IS NULL yet.
-                            Condition.prop("parent").eq(userId.getId())
+                    Condition.prop("uname").eq(uid)//, //TODO: fix this properly
+//                    userId == null ?
+//                            Condition.prop("parent").notLike("%") : // Sugar doesn't support IS NULL yet.
+//                            Condition.prop("parent").eq(userId.getId())
             ).first();
 
             if (child == null) {

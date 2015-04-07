@@ -47,18 +47,26 @@ public class Message extends SugarRecord<Message> {
     }
 
     private static Message findInDb(String body, Date sent, List<MessageUid> msgUids) {
-        for (MessageUid msgUid: msgUids) {
-            MessageUid matchMsgUid = Select.from(MessageUid.class)
-                    .where(
-                            Condition.prop("uid").eq(msgUid.uid),
-                            Condition.prop("signature").eq(msgUid.signature)
-                    ).first();
-            if (matchMsgUid == null) {
-                return null;
+        if (msgUids.isEmpty()) {
+            for (Message msg: Select.from(Message.class).where(Condition.prop("body").eq(body)).list()) {
+                if (Select.from(MessageUid.class).where(Condition.prop("msg").eq(msg.getId())).list().isEmpty()) {
+                    return msg;
+                }
             }
-            Message msg = matchMsgUid.msg;
-            if (msg.body.equals(body) && msg.sent.equals(sent)) {
-                return msg;
+        } else {
+            for (MessageUid msgUid : msgUids) {
+                MessageUid matchMsgUid = Select.from(MessageUid.class)
+                        .where(
+                                Condition.prop("uid").eq(msgUid.uid.getId()),
+                                Condition.prop("signature").eq(msgUid.signature)
+                        ).first();
+                if (matchMsgUid == null) {
+                    return null;
+                }
+                Message msg = matchMsgUid.msg;
+                if (msg.body.equals(body) && msg.sent.equals(sent)) {
+                    return msg;
+                }
             }
         }
         return null;
@@ -75,7 +83,6 @@ public class Message extends SugarRecord<Message> {
         // Get the user ids and infer the user.
         assertEquals("user", reader.nextName());
         List<MessageUid> msgUids = MessageUid.readUnsavedMessageUids(reader);
-        assertFalse(msgUids.isEmpty());
 
         reader.endObject();
 

@@ -46,9 +46,12 @@ public class FollowController {
             uid.user = new User();
         }
 
-        if (name.equals(uid.user.name)) {
+        if (name.equals(uid.user.name) && uid.user.following) {
             warn(TAG, "You are already following " + name);
             return false;
+        }
+        if (name.isEmpty()) {
+            name = null;
         }
         uid.user.name = name;
         uid.user.following = true;
