@@ -164,10 +164,10 @@ public class ConnectionService extends IntentService {
             debug(TAG, "no OMiN devices detected");
             return;
         }
-        for (String address: ominDevices.keySet()) {
-            if (!recentDevices.contains(address)) {
+        for (Map.Entry<String, BluetoothDevice> entry: ominDevices.entrySet()) {
+            if (!recentDevices.contains(entry.getKey())) {
                 debug(TAG, "connecting to new device");
-                connectToDevice(ominDevices.get(address));
+                connectToDevice(entry.getValue());
                 return;
             }
         }

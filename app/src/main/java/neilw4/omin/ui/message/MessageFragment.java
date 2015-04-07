@@ -16,9 +16,12 @@ import com.melnykov.fab.FloatingActionButton;
 
 import neilw4.omin.R;
 import neilw4.omin.controller.MessageController;
+import neilw4.omin.ui.Refreshable;
+
+import static neilw4.omin.Logger.warn;
 
 
-public class MessageFragment extends ListFragment {
+public class MessageFragment extends ListFragment implements Refreshable {
 
     private MessageAdapter adapter;
     private LayoutInflater inflater;
@@ -54,7 +57,14 @@ public class MessageFragment extends ListFragment {
         });
     }
 
+    @Override
+    public void refresh() {
+        adapter.notifyDataSetChanged();
+    }
+
     class SendMessagePopup implements DialogInterface.OnClickListener {
+
+        private final String TAG = SendMessagePopup.class.getSimpleName();
 
         private final View mRoot;
         private final EditText mMessageContent;
@@ -87,7 +97,11 @@ public class MessageFragment extends ListFragment {
             if (which == DialogInterface.BUTTON_POSITIVE) {
                 String body = mMessageContent.getText().toString();
                 if (MessageController.sendMessage(body, getActivity())) {
-                    adapter.notifyDataSetChanged();
+                    try {
+                        ((Refreshable) getActivity()).refresh();
+                    } catch (NullPointerException | ClassCastException e) {
+                        warn(TAG, "Error while refreshing messages", e);
+                    }
                 }
             }
         }

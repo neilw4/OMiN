@@ -19,9 +19,12 @@ import com.nhaarman.listviewanimations.itemmanipulation.swipedismiss.undo.TimedU
 
 import neilw4.omin.R;
 import neilw4.omin.controller.FollowController;
+import neilw4.omin.ui.Refreshable;
+
+import static neilw4.omin.Logger.warn;
 
 
-public class FollowFragment extends ListFragment {
+public class FollowFragment extends ListFragment implements Refreshable {
 
     private FollowAdapter adapter;
     private LayoutInflater inflater;
@@ -57,18 +60,25 @@ public class FollowFragment extends ListFragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new SendMessagePopup().show();
+                new FollowUserPopup().show();
             }
         });
     }
 
-    class SendMessagePopup implements DialogInterface.OnClickListener {
+    @Override
+    public void refresh() {
+        adapter.notifyDataSetChanged();
+    }
+
+    class FollowUserPopup implements DialogInterface.OnClickListener {
+
+        private final String TAG = FollowUserPopup.class.getSimpleName();
 
         private final View mRoot;
         private final EditText mName;
         private final EditText mId;
 
-        public SendMessagePopup() {
+        public FollowUserPopup() {
             mRoot = inflater.inflate(R.layout.dialog_new_follow, null);
             mName = (EditText) mRoot.findViewById(R.id.new_follow_name);
             mId = (EditText) mRoot.findViewById(R.id.new_follow_id);
@@ -99,7 +109,11 @@ public class FollowFragment extends ListFragment {
                 String id = mId.getText().toString();
 
                 if (FollowController.followUser(name, id)) {
-                    adapter.notifyDataSetChanged();
+                    try {
+                        ((Refreshable) getActivity()).refresh();
+                    } catch (NullPointerException | ClassCastException e) {
+                        warn(TAG, "Error while refreshing messages", e);
+                    }
                 }
             }
         }

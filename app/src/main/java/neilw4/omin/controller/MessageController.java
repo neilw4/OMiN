@@ -67,7 +67,7 @@ public class MessageController {
             List<MessageUid> msgUids = Select.from(MessageUid.class).where(Condition.prop("msg").eq(message.getId())).list();
             boolean showMessage = msgUids.isEmpty(); // Show anonymous messages.
             for (MessageUid msgUid: msgUids) {
-                if (msgUid.uid.user.following) {
+                if (msgUid.uid.user != null && msgUid.uid.user.following) {
                     showMessage = true;
                     break;
                 }

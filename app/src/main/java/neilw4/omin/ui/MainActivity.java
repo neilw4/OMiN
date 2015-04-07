@@ -1,5 +1,6 @@
 package neilw4.omin.ui;
 
+import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.FragmentTransaction;
@@ -9,9 +10,12 @@ import neilw4.omin.Logger;
 import neilw4.omin.R;
 import neilw4.omin.ui.uname.UnameBar;
 
+import static neilw4.omin.Logger.debug;
 
-public class MainActivity extends ActionBarActivity implements ActionBar.TabListener {
 
+public class MainActivity extends ActionBarActivity implements ActionBar.TabListener, Refreshable {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
     SectionsPagerAdapter mSectionsPagerAdapter;
     ViewPager mViewPager;
     UnameBar mUidManager;
@@ -64,4 +68,12 @@ public class MainActivity extends ActionBarActivity implements ActionBar.TabList
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
     }
 
+    @Override
+    public void refresh() {
+        mUidManager.refresh();
+        for (Fragment f: getSupportFragmentManager().getFragments()) {
+            debug(TAG, "refreshing " + f.getClass().getSimpleName());
+            ((Refreshable)f).refresh();
+        }
+    }
 }

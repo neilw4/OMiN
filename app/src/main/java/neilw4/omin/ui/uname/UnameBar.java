@@ -15,8 +15,9 @@ import android.widget.ImageButton;
 import neilw4.omin.R;
 import neilw4.omin.controller.UnameController;
 import neilw4.omin.db.SecretKey;
+import neilw4.omin.ui.Refreshable;
 
-public class UnameBar {
+public class UnameBar implements Refreshable {
 
     final Context mContext;
 
@@ -38,10 +39,6 @@ public class UnameBar {
 
         editTextBg = mEditUname.getBackground();
 
-        SecretKey myKey = UnameController.getSecretKey();
-        if (myKey != null) {
-            uname = myKey.uid.uname;
-        }
 
         mEditUname.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -72,7 +69,7 @@ public class UnameBar {
             }
         });
 
-        configureView();
+        refresh();
     }
 
     public void configureView() {
@@ -130,4 +127,12 @@ public class UnameBar {
         }
     }
 
+    @Override
+    public void refresh() {
+        SecretKey myKey = UnameController.getSecretKey();
+        if (myKey != null) {
+            uname = myKey.uid.uname;
+        }
+        configureView();
+    }
 }
