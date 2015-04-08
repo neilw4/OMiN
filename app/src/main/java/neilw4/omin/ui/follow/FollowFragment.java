@@ -86,7 +86,7 @@ public class FollowFragment extends ListFragment implements Refreshable {
 
         public void show() {
             new AlertDialog.Builder(getActivity())
-                    .setTitle(R.string.new_message)
+                    .setTitle(R.string.new_follow)
                     .setView(mRoot)
                     .setPositiveButton(R.string.follow, this)
                     .setNegativeButton(android.R.string.cancel, this)
