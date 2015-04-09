@@ -26,13 +26,6 @@ import static neilw4.omin.Logger.*;
 public class P2PConnection implements ConnectionManager.ConnectionCallback {
     public static final String TAG = P2PConnection.class.getSimpleName();
 
-    private Handler handler = new Handler();
-    private Context context;
-
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
     @Override
     public void onConnectedToServer(BluetoothDevice device, InputStream in, OutputStream out) throws IOException {
         onConnected(device, in, out);

@@ -42,22 +42,25 @@ public class ConnectionService extends IntentService {
     private static P2PConnection p2PConnection = new P2PConnection();
     private static PendingIntent repeatingIntent = null;
 
-    public static void start(Context context) {
+    public static synchronized void start(Context context) {
         if (BluetoothAdapter.getDefaultAdapter() == null) {
             warn(TAG, "Could not start service: bluetooth adapter not available");
             return;
         }
-
-        if (repeatingIntent == null) {
-            Intent startIntent = new Intent(context, ConnectionService.class);
-            startIntent.setAction(ACTION_START);
-            context.startService(startIntent);
-            Intent scanIntent = new Intent(context, ConnectionService.class);
-            scanIntent.setAction(ACTION_SCAN);
-            repeatingIntent = PendingIntent.getService(context, 0, scanIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            AlarmManager alarm = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, 0, REPEAT_SECONDS * 1000, repeatingIntent);
+        AlarmManager alarm = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+        if (repeatingIntent != null) {
+            debug(TAG, "refreshing repeating alarm");
+            alarm.cancel(repeatingIntent);
+            repeatingIntent = null;
         }
+
+        Intent startIntent = new Intent(context, ConnectionService.class);
+        startIntent.setAction(ACTION_START);
+        context.startService(startIntent);
+        Intent scanIntent = new Intent(context, ConnectionService.class);
+        scanIntent.setAction(ACTION_SCAN);
+        repeatingIntent = PendingIntent.getService(context, 0, scanIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+        alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, 0, REPEAT_SECONDS * 1000, repeatingIntent);
     }
 
     public static void stop(Context context) {
@@ -103,11 +106,12 @@ public class ConnectionService extends IntentService {
                     startActivity(discoverableIntent);
                 }
 
-                debug(TAG, "starting server");
                 connection = new ConnectionManager(p2PConnection);
-                p2PConnection.setContext(getBaseContext());
-                connection.start();
             }
+        }
+        if (connection.getState() == ConnectionManager.STATE_NONE) {
+            debug(TAG, "starting server");
+            connection.start();
         }
     }
 
@@ -123,7 +127,6 @@ public class ConnectionService extends IntentService {
                 connection.stop();
                 connection = null;
             }
-            p2PConnection.setContext(null);
         }
     }
 
@@ -249,11 +252,9 @@ public class ConnectionService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         String action = intent.getAction();
         startServer();
-        if (ACTION_START.equals(action)) {
-            // Server already started - do nothing.
-        } else if (ACTION_STOP.equals(action)) {
+        if (ACTION_STOP.equals(action)) {
             stopServer();
-        } else if (ACTION_SCAN.equals(action)) {
+        } else if (ACTION_START.equals(action) || ACTION_SCAN.equals(action)) {
             startDiscovery();
         } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
             onStartDiscovery();
