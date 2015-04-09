@@ -23,7 +23,6 @@ import java.util.UUID;
 
 import neilw4.omin.P2PConnection;
 import neilw4.omin.Logger;
-import neilw4.omin.crypto.sign.Signer;
 
 public class ConnectionService extends IntentService {
 

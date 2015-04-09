@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -15,17 +16,19 @@ import android.widget.EditText;
 import com.melnykov.fab.FloatingActionButton;
 
 import neilw4.omin.R;
+import neilw4.omin.connection.ConnectionServiceStarter;
 import neilw4.omin.controller.MessageController;
 import neilw4.omin.ui.Refreshable;
 
 import static neilw4.omin.Logger.warn;
 
 
-public class MessageFragment extends ListFragment implements Refreshable, MessageController.OnMessagesChangedListener {
+public class MessageFragment extends ListFragment implements Refreshable, MessageController.OnMessagesChangedListener, SwipeRefreshLayout.OnRefreshListener {
 
     private static final String TAG = MessageFragment.class.getSimpleName();
     private MessageAdapter adapter;
     private LayoutInflater inflater;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public static MessageFragment newInstance() {
         MessageFragment fragment = new MessageFragment();
@@ -56,6 +59,10 @@ public class MessageFragment extends ListFragment implements Refreshable, Messag
                 new SendMessagePopup().show();
             }
         });
+
+        swipeRefreshLayout = (SwipeRefreshLayout) getView().findViewById(R.id.refresh_messages);
+        swipeRefreshLayout.setOnRefreshListener(this);
+
     }
 
     @Override
@@ -68,6 +75,18 @@ public class MessageFragment extends ListFragment implements Refreshable, Messag
     public void onStop() {
         super.onStop();
         MessageController.removeChangeListener();
+    }
+
+    @Override
+    public void onRefresh() {
+        refresh();
+        ConnectionServiceStarter.start(getActivity().getApplicationContext());
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 700);
     }
 
     @Override
