@@ -3,7 +3,7 @@ OMiN - an Opportunistic Microblogging Network
 OMiN is a pocket switched network running on smartphones and tablets. It allows users to send and receive messages without using any global infrastructure such as the internet. Messages are stored by devices and forwarded to more devices using Bluetooth.
 
 # Project Layout
-The project is split into three different modules, each build using Gradle:
+The project is split into three different modules, each built using Gradle:
 - The app module contains the Android app to be installed on every node.
 - The pkg module is the central authentication server, which runs on the school’s host server via CGI.
 - The crypto module is a library of cryptography functions used by both the app and authentication server.

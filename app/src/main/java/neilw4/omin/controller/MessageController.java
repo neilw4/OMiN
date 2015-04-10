@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import neilw4.omin.connection.ConnectionServiceStarter;
+import neilw4.omin.connection.BtManager;
+import neilw4.omin.connection.BtService;
 import neilw4.omin.crypto.sign.Signer;
 import neilw4.omin.db.Message;
 import neilw4.omin.db.MessageUid;
@@ -50,7 +51,7 @@ public class MessageController {
                 @Override
                 public void onSuccess() {
                     // Initiate scan for nearby devices.
-                    ConnectionServiceStarter.start(context.getApplicationContext());
+                    BtManager.getInstance().scan(context);
                 }
 
                 @Override
@@ -58,7 +59,7 @@ public class MessageController {
                 }
             });
         } else {
-            ConnectionServiceStarter.start(context.getApplicationContext());
+            BtManager.getInstance().scan(context);
         }
         info(TAG, "new message " + msg);
         return true;

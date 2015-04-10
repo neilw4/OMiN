@@ -16,7 +16,8 @@ import android.widget.EditText;
 import com.melnykov.fab.FloatingActionButton;
 
 import neilw4.omin.R;
-import neilw4.omin.connection.ConnectionServiceStarter;
+import neilw4.omin.connection.BtManager;
+import neilw4.omin.connection.BtService;
 import neilw4.omin.controller.MessageController;
 import neilw4.omin.ui.Refreshable;
 
@@ -80,7 +81,7 @@ public class MessageFragment extends ListFragment implements Refreshable, Messag
     @Override
     public void onRefresh() {
         refresh();
-        ConnectionServiceStarter.start(getActivity().getApplicationContext());
+        BtManager.getInstance().scan(getActivity());
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

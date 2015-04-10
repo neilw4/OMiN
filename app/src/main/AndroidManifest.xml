@@ -30,10 +30,13 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".connection.ConnectionServiceStarter"
+        <service
+            android:name=".connection.BtService"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="false" >
+        </service>
+
+        <receiver android:name=".connection.BtBroadcastReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
@@ -46,12 +49,6 @@
                 <action android:name="android.bluetooth.device.action.UUID" />
             </intent-filter>
         </receiver>
-
-        <service
-            android:name=".connection.ConnectionService"
-            android:enabled="true"
-            android:exported="false" >
-        </service>
 
         <meta-data
             android:name="DATABASE"
